@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Веб-майстерня: від першого тегу до сайту з базою даних і AI</title>
+<title>Курс</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@500;700;800&display=swap" rel="stylesheet">
@@ -211,6 +211,35 @@ textarea.ed{white-space:pre;overflow:auto;border:0;resize:vertical;min-height:28
 .tc pre{font-size:13.5px;padding:12px 16px}
 .tc .ch{padding:6px 10px}
 .tc .out iframe{height:150px}
+.pyout{display:none;background:#16151C;color:#E6E3F0;font:13.5px/1.55 'JetBrains Mono',monospace;padding:12px 16px;border-top:3px solid #3776AB;max-height:420px;overflow:auto}
+.pyout.on{display:block}
+.pyout div{white-space:pre-wrap;word-break:break-word}
+.pyout .perr{color:#FF9B9B}.pyout .pinfo{color:#8F8AA0}
+.pyout img{display:block;max-width:100%;background:#fff;border-radius:8px;margin:8px 0}
+.pin{background:#22202B;padding:8px 14px 10px;border-top:1px solid #34313F}
+.pin label{display:block;color:#A9A4B8;font-size:12px;margin-bottom:4px}
+.pin textarea{width:100%;background:#16151C;color:#FFD166;border:1px solid #34313F;border-radius:8px;font:13px 'JetBrains Mono',monospace;padding:6px 8px;resize:vertical}
+.play.py .pg{grid-template-columns:1.1fr 1fr}
+.play.py .pl{display:flex;flex-direction:column;background:var(--code-bg)}
+.play.py .pl textarea.ed{flex:1}
+.play.py .pyout{max-height:none;min-height:280px;border-top:0}
+.sheet{margin:20px 0;background:#fff;border:1px solid #DADCE0;border-radius:12px;overflow:hidden;font-family:Arial,'Golos Text',sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.sbar{display:flex;align-items:center;gap:10px;padding:6px 10px;border-bottom:1px solid #DADCE0;font-size:13.5px;background:#F8F9FA}
+.sref{min-width:46px;padding:2px 8px;border:1px solid #DADCE0;border-radius:4px;background:#fff;font-weight:600;color:#3C4043}
+.sfx{color:#80868B;font-style:italic;font-weight:700}
+.sf{font-family:'JetBrains Mono',monospace;color:#1D1B26}
+.swrap{overflow-x:auto}
+.sheet table{border-collapse:collapse;width:100%;font-size:13.5px}
+.sheet thead th,.sheet tbody th{background:#F8F9FA;color:#5F6368;font-weight:500;font-size:12px;border:1px solid #E2E3E3;padding:3px 8px;text-align:center;min-width:28px}
+.sheet th.son{background:#D3E3FD;color:#0B57D0}
+.sheet td{border:1px solid #E2E3E3;padding:5px 9px;white-space:nowrap;color:#202124}
+.sheet td.snum{text-align:right}
+.sheet td.shd{font-weight:700;background:#F1F3F4}
+.sheet td.hg{background:#CEEAD6}.sheet td.hr{background:#FAD2CF}.sheet td.hy{background:#FEEFC3}.sheet td.hb{background:#D2E3FC}
+.sheet td.ssel{outline:2px solid #1A73E8;outline-offset:-2px}
+.stab{display:flex;background:#F8F9FA;border-top:1px solid #DADCE0;padding:0 10px}
+.stab span{font-size:13px;padding:6px 14px;background:#fff;border-left:1px solid #DADCE0;border-right:1px solid #DADCE0;color:#188038;font-weight:600;border-bottom:3px solid #188038}
+.sheet figcaption{font-size:14px;color:var(--muted);padding:10px 14px;border-top:1px solid #EEE;font-family:'Golos Text',sans-serif}
 .donebar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:40px;padding:18px 20px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);flex-wrap:wrap}
 .done-btn.is{background:#18A058}
 .pn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
@@ -251,7 +280,7 @@ textarea.ed{white-space:pre;overflow:auto;border:0;resize:vertical;min-height:28
   .wrap{padding:24px 16px 80px}
   .stats{grid-template-columns:1fr 1fr}
   .goals ul{grid-template-columns:1fr}
-  .pg{grid-template-columns:1fr}
+  .pg,.play.py .pg{grid-template-columns:1fr}
   .hero{padding:32px 24px}
   .pn{grid-template-columns:1fr}
   .demo iframe{height:560px}
@@ -269,13 +298,24 @@ textarea.ed{white-space:pre;overflow:auto;border:0;resize:vertical;min-height:28
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
 <script>
 /*__DATA__*/
 (function(){
 const B = {}; DATA.blocks.forEach(b => B[b.id] = b);
+const M = Object.assign({
+  brand: 'Веб-майстерня', logo: '</>', kicker: 'Курс веб-розробки',
+  hero: 'Від першого тегу до власного сайту з базою даних в інтернеті. HTML, CSS, JavaScript, бекенд і робота з AI. Крок за кроком, з живими прикладами.',
+  deco: '<header>\n  <h1>Полиця</h1>\n</header>\n.card {\n  display: grid;\n}\nconst items = await\n  db.from("items")\n    .select("*");\nrender(items);',
+  projectName: 'Полиця', projectIcon: '📚',
+  projectBlurb: 'Проєкт «Полиця» — особиста колекція улюблених ігор, книг чи фільмів з пошуком, оцінками й базою даних. Кожен урок додає йому одну нову деталь.',
+  checkTitle: 'Перевір у браузері', workCard: 'VS Code, браузер, GitHub: однаково в школі й удома →',
+  nav: [['tools','🛠️ Де працювати'],['browser','🔍 Як перевіряти сторінку'],['project','📚 Проєкт «Полиця»'],['tags','🏷️ Довідник тегів'],['glossary','📘 Словник термінів'],['homework','🏠 Домашні завдання']]
+}, DATA.meta || {});
 const L = DATA.lessons, T = DATA.tests, P = DATA.pages;
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+document.querySelector('.topbar .brand').innerHTML = `<span class="logo">${esc(M.logo)}</span>${M.brand}`;
 
 /* ---------- progress ---------- */
 let done = {};
@@ -311,8 +351,98 @@ function runInto(frame, cons, code, lang, h){
   if (h) frame.style.height = h + 'px';
 }
 
+/* ---------- python runner (Pyodide у Web Worker) ---------- */
+const PYO = 'https://cdn.jsdelivr.net/pyodide/v0.29.5/full/';
+const PY_SETUP = `
+import builtins, sys, io, base64, os, warnings
+os.environ['MPLBACKEND'] = 'Agg'
+warnings.filterwarnings('ignore')
+_inp = []
+def __set_inp(s):
+    global _inp
+    _inp = s.split('\\n') if s else []
+def _input(prompt=''):
+    print(prompt, end='')
+    v = _inp.pop(0) if _inp else ''
+    print(v)
+    return v
+builtins.input = _input
+def __run(code):
+    import traceback
+    try:
+        exec(compile(code, 'main.py', 'exec'), {'__name__': '__main__'})
+    except SystemExit:
+        pass
+    except BaseException:
+        et, ev, tb = sys.exc_info()
+        sys.stderr.write(''.join(traceback.format_exception(et, ev, tb.tb_next)))
+def __figs():
+    if 'matplotlib.pyplot' not in sys.modules:
+        return ''
+    import matplotlib.pyplot as plt
+    out = []
+    for n in plt.get_fignums():
+        b = io.BytesIO(); plt.figure(n).savefig(b, format='png', dpi=90, bbox_inches='tight')
+        out.append(base64.b64encode(b.getvalue()).decode())
+    plt.close('all')
+    return '|'.join(out)
+`;
+let pyW = null, pyBusy = Promise.resolve(), pyLoaded = false;
+function pyWorker(){
+  if (pyW) return pyW;
+  const files = DATA.files || {};
+  const src = `importScripts('${PYO}pyodide.js');
+let py;
+const ready = (async () => {
+  py = await loadPyodide({ indexURL: '${PYO}' });
+  const files = ${JSON.stringify(files)};
+  for (const k in files) py.FS.writeFile(k, files[k]);
+  py.runPython(${JSON.stringify(PY_SETUP)});
+  postMessage({ t: 'ready' });
+})();
+onmessage = async (e) => {
+  const { id, code, inp } = e.data;
+  try { await ready; } catch (err) { postMessage({ id, t: 'err', m: 'Не вдалося завантажити Python: ' + err }); postMessage({ id, t: 'done' }); return; }
+  postMessage({ id, t: 'start' });
+  py.setStdout({ batched: (s) => postMessage({ id, t: 'out', m: s }) });
+  py.setStderr({ batched: (s) => postMessage({ id, t: 'err', m: s }) });
+  try {
+    await py.loadPackagesFromImports(code, { messageCallback: (m) => postMessage({ id, t: 'info', m }) });
+    py.globals.get('__set_inp')(inp || '');
+    py.globals.get('__run')(code);
+    const figs = py.globals.get('__figs')();
+    if (figs) postMessage({ id, t: 'img', m: figs });
+  } catch (err) { postMessage({ id, t: 'err', m: String(err.message || err) }); }
+  postMessage({ id, t: 'done' });
+};`;
+  pyW = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+  return pyW;
+}
+let pyId = 0;
+function pyRun(code, inp, outEl){
+  outEl.innerHTML = ''; outEl.classList.add('on');
+  const line = (cls, text) => { const d = document.createElement('div'); d.className = cls; d.textContent = text; outEl.appendChild(d); return d; };
+  const status = line('pinfo', pyLoaded ? '⏳ Виконую…' : '⏳ Завантажую Python у браузер (лише перший раз, кілька секунд)…');
+  pyBusy = pyBusy.then(() => new Promise(resolve => {
+    const w = pyWorker(), id = ++pyId; let timer = null, any = false;
+    const finish = () => { clearTimeout(timer); w.removeEventListener('message', on); resolve(); };
+    const on = (e) => {
+      const d = e.data; if (d.t === 'ready') { pyLoaded = true; return; }
+      if (d.id !== id) return;
+      if (d.t === 'start') { status.textContent = '⏳ Виконую…'; timer = setTimeout(() => { w.terminate(); pyW = null; pyLoaded = false; status.remove(); line('perr', '⏱ Програма працювала понад 15 секунд і була зупинена. Можливо, нескінченний цикл?'); finish(); }, 15000); }
+      else if (d.t === 'info') { status.textContent = '📦 ' + d.m.replace('Loading', 'Завантажую').replace('Loaded', 'Завантажено'); }
+      else if (d.t === 'out') { any = true; line('pout', d.m); }
+      else if (d.t === 'err') { any = true; line('perr', d.m); }
+      else if (d.t === 'img') { any = true; d.m.split('|').forEach(b => { const im = document.createElement('img'); im.src = 'data:image/png;base64,' + b; im.alt = 'Графік'; outEl.appendChild(im); }); }
+      else if (d.t === 'done') { status.remove(); if (!any) line('pinfo', '✓ Виконано (програма нічого не вивела)'); finish(); }
+    };
+    w.addEventListener('message', on);
+    w.postMessage({ id, code, inp });
+  }));
+}
+
 /* ---------- section renderers ---------- */
-const PL = { html:'markup', css:'css', javascript:'javascript', sql:'sql', bash:'bash', json:'json', text:'none' };
+const PL = { html:'markup', css:'css', javascript:'javascript', sql:'sql', bash:'bash', json:'json', text:'none', python:'python', sheets:'none' };
 function secHTML(s, i){
   switch(s.t){
     case 'h': return `<h2>${s.v}</h2>`;
@@ -327,19 +457,38 @@ function secHTML(s, i){
     case 'fig': return `<figure class="fig">${s.v}<figcaption>${s.cap}</figcaption></figure>`;
     case 'code': {
       const lang = PL[s.lang] || 'none';
-      return `<div class="code" data-i="${i}"><div class="ch"><span class="dots"><i></i><i></i><i></i></span><span class="ttl">${esc(s.title||'')}</span><span class="lang">${s.lang}</span><button class="btn cp">Копіювати</button>${s.run?'<button class="btn run">▶ Запустити</button>':''}</div><pre><code class="language-${lang}">${esc(s.v)}</code></pre></div>${s.note?`<p class="note">${s.note}</p>`:''}`;
+      const lbl = s.lang === 'sheets' ? 'формула' : s.lang;
+      return `<div class="code" data-i="${i}"><div class="ch"><span class="dots"><i></i><i></i><i></i></span><span class="ttl">${esc(s.title||'')}</span><span class="lang">${lbl}</span><button class="btn cp">Копіювати</button>${s.run?'<button class="btn run">▶ Запустити</button>':''}</div><pre><code class="language-${lang}">${esc(s.v)}</code></pre>${s.lang==='python'&&s.run?`${s.inp!==undefined?`<div class="pin"><label>⌨️ Що ввести (кожен рядок — одна відповідь на input):</label><textarea rows="${Math.min(4,(s.inp||'').split('\n').length)}" spellcheck="false">${esc(s.inp||'')}</textarea></div>`:''}<div class="pyout"></div>`:''}</div>${s.note?`<p class="note">${s.note}</p>`:''}`;
     }
-    case 'try': return `<div class="play" data-i="${i}"><div class="ph">🧪 <span>${s.title}</span><button class="btn rs">↺ Скинути</button><button class="btn cp">Копіювати</button></div><div class="pg"><textarea class="ed" spellcheck="false"></textarea><iframe sandbox="allow-scripts allow-forms" title="Результат"></iframe></div><div class="cons"></div></div>`;
+    case 'try': if (s.lang === 'python') return `<div class="play py" data-i="${i}"><div class="ph">🐍 <span>${s.title}</span><button class="btn rs">↺ Скинути</button><button class="btn cp">Копіювати</button><button class="btn prun">▶ Запустити</button></div><div class="pg"><div class="pl"><textarea class="ed" spellcheck="false"></textarea><div class="pin"><label>⌨️ Що ввести для input():</label><textarea class="pinp" rows="2" spellcheck="false"></textarea></div></div><div class="pyout on"><div class="pinfo">Натисни «▶ Запустити» або Ctrl+Enter</div></div></div></div>`;
+      return `<div class="play" data-i="${i}"><div class="ph">🧪 <span>${s.title}</span><button class="btn rs">↺ Скинути</button><button class="btn cp">Копіювати</button></div><div class="pg"><textarea class="ed" spellcheck="false"></textarea><iframe sandbox="allow-scripts allow-forms" title="Результат"></iframe></div><div class="cons"></div></div>`;
     case 'demo': return `<div class="demo"><div class="bb"><i></i><i></i><i></i><span>твій-логін.github.io/polytsia</span></div><iframe sandbox="allow-scripts allow-forms" title="Демо"></iframe></div>`;
     case 'plan': return planTable();
+    case 'sheet': return sheetHTML(s);
   }
   return '';
+}
+function sheetHTML(s){
+  const n = Math.max(...s.rows.map(r => r.length)), L2 = 'ABCDEFGHIJKLMNOP';
+  const isNum = v => /^-?[\d\s]+([.,]\d+)?\s*(₴|%|год)?$/.test(String(v).trim()) && String(v).trim() !== '';
+  let h = `<figure class="sheet"><div class="sbar"><span class="sref">${s.sel||''}</span><span class="sfx">fx</span><span class="sf">${esc(s.f||'')}</span></div><div class="swrap"><table><thead><tr><th></th>${[...Array(n)].map((_,c)=>`<th class="${s.sel&&s.sel[0]===L2[c]?'son':''}">${L2[c]}</th>`).join('')}</tr></thead><tbody>`;
+  s.rows.forEach((r, ri) => {
+    h += `<tr><th class="${s.sel&&s.sel.slice(1)==String(ri+1)?'son':''}">${ri+1}</th>`;
+    for (let c = 0; c < n; c++) {
+      const v = r[c] ?? '', ref = L2[c] + (ri+1), hl = s.hl[ref];
+      h += `<td class="${ri===0?'shd ':''}${hl?'h'+hl+' ':''}${ref===s.sel?'ssel ':''}${isNum(v)?'snum':''}">${esc(v)}</td>`;
+    }
+    h += '</tr>';
+  });
+  h += `</tbody></table></div><div class="stab"><span>${esc(s.name||'Аркуш1')}</span></div>${s.cap?`<figcaption>${s.cap}</figcaption>`:''}</figure>`;
+  return h;
 }
 function mountSections(root, secs){
   root.querySelectorAll('.code').forEach(el => {
     const s = secs[+el.dataset.i];
     el.querySelector('.cp').onclick = e => copy(s.v, e.target);
     const rb = el.querySelector('.run');
+    if (rb && s.lang === 'python') { rb.onclick = () => { const inp = el.querySelector('.pin textarea'); pyRun(s.v, inp ? inp.value : (s.inp || ''), el.querySelector('.pyout')); rb.textContent = '↻ Ще раз'; }; return; }
     if (rb) rb.onclick = () => {
       let out = el.querySelector('.out');
       if (!out) { out = document.createElement('div'); out.className = 'out'; out.innerHTML = '<iframe sandbox="allow-scripts allow-forms" title="Результат"></iframe><div class="cons"></div>'; el.appendChild(out); }
@@ -347,7 +496,19 @@ function mountSections(root, secs){
       rb.textContent = '↻ Ще раз';
     };
   });
-  root.querySelectorAll('.play').forEach(el => {
+  root.querySelectorAll('.play.py').forEach(el => {
+    const s = secs[+el.dataset.i]; const ta = el.querySelector('.ed'), ip = el.querySelector('.pinp'), out = el.querySelector('.pyout');
+    ta.value = s.v; ip.value = s.inp || '';
+    const go = () => pyRun(ta.value, ip.value, out);
+    el.querySelector('.prun').onclick = go;
+    ta.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); go(); }
+      if (e.key === 'Tab') { e.preventDefault(); const p = ta.selectionStart; ta.value = ta.value.slice(0,p) + '    ' + ta.value.slice(ta.selectionEnd); ta.selectionStart = ta.selectionEnd = p + 4; }
+    });
+    el.querySelector('.rs').onclick = () => { ta.value = s.v; ip.value = s.inp || ''; out.innerHTML = ''; };
+    el.querySelector('.cp').onclick = e => copy(ta.value, e.target);
+  });
+  root.querySelectorAll('.play:not(.py)').forEach(el => {
     const s = secs[+el.dataset.i]; const ta = el.querySelector('textarea'), fr = el.querySelector('iframe'), cons = el.querySelector('.cons');
     ta.value = s.v; let t;
     const go = () => runInto(fr, cons, ta.value, 'html');
@@ -403,15 +564,10 @@ function mountQuiz(root, qs){
 /* ---------- sidebar ---------- */
 function side(route){
   const total = L.length, d = L.filter(l => done[l.n]).length;
-  let h = `<a class="brand" href="#home"><span class="logo">&lt;/&gt;</span>Веб-майстерня</a>
+  let h = `<a class="brand" href="#home"><span class="logo">${esc(M.logo)}</span>${M.brand}</a>
   <nav class="nav-links">
     <a href="#home" class="${route==='home'?'on':''}">🏠 Головна</a>
-    <a href="#tools" class="${route==='tools'?'on':''}">🛠️ Де працювати</a>
-    <a href="#browser" class="${route==='browser'?'on':''}">🔍 Як перевіряти сторінку</a>
-    <a href="#project" class="${route==='project'?'on':''}">📚 Проєкт «Полиця»</a>
-    <a href="#tags" class="${route==='tags'?'on':''}">🏷️ Довідник тегів</a>
-    <a href="#glossary" class="${route==='glossary'?'on':''}">📘 Словник термінів</a>
-    <a href="#homework" class="${route==='homework'?'on':''}">🏠 Домашні завдання</a>
+    ${M.nav.map(([k,lbl])=>`<a href="#${k}" class="${route===k?'on':''}">${lbl}</a>`).join('')}
     ${P.teacher?`<a href="#teacher" class="${route==='teacher'?'on':''}">🧑‍🏫 Для вчителя</a>`:''}
   </nav>
   <div class="prog">Пройдено ${d} з ${total}<div class="bar"><i style="width:${d/total*100}%"></i></div></div>`;
@@ -431,11 +587,10 @@ function side(route){
 
 /* ---------- views ---------- */
 function home(){
-  const deco = '<header>\n  <h1>Полиця</h1>\n</header>\n.card {\n  display: grid;\n}\nconst items = await\n  db.from("items")\n    .select("*");\nrender(items);';
-  let h = `<section class="hero"><div class="deco">${esc(deco)}</div>
-    <div style="font:700 13px 'Golos Text';letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:14px">Курс веб-розробки · ${L.length} уроків${DATA.edition==='teacher'?' · видання для вчителя':''}</div>
-    <h1>Веб-майстерня</h1>
-    <p>Від першого тегу до власного сайту з базою даних в інтернеті. HTML, CSS, JavaScript, бекенд і робота з AI. Крок за кроком, з живими прикладами.</p>
+  let h = `<section class="hero"><div class="deco">${esc(M.deco)}</div>
+    <div style="font:700 13px 'Golos Text';letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:14px">${M.kicker} · ${L.length} уроків${DATA.edition==='teacher'?' · видання для вчителя':''}</div>
+    <h1>${M.brand}</h1>
+    <p>${M.hero}</p>
     <div class="tags">${DATA.blocks.map(b=>`<b style="background:${b.color}">${b.icon} ${b.name}</b>`).join('')}</div></section>
   <div class="stats">
     <div class="stat"><b>${L.length}</b><span>уроків з практикою</span></div>
@@ -444,7 +599,7 @@ function home(){
     <div class="stat"><b>${L.reduce((s,l)=>s+l.hw.length,0)}</b><span>домашніх завдань</span></div>
   </div>
   <h2 style="font-size:26px;margin:0 0 6px">Що ми створимо</h2>
-  <p style="color:var(--muted);margin:0 0 4px">Проєкт «Полиця» — особиста колекція улюблених ігор, книг чи фільмів з пошуком, оцінками й базою даних. Кожен урок додає йому одну нову деталь. <a href="#project">Подивитися демо →</a></p>
+  <p style="color:var(--muted);margin:0 0 4px">${M.projectBlurb} <a href="#project">Детальніше →</a></p>
   <h2 style="font-size:26px;margin:34px 0 14px">Маршрут курсу</h2><div class="road">`;
   DATA.blocks.forEach(b => {
     const ls = L.filter(l => l.block === b.id), ts = T.filter(t => t.block === b.id);
@@ -455,12 +610,12 @@ function home(){
   <div class="cards">
     <div class="cd"><div class="i">📖</div><h4>Читай і запускай</h4><p>Кожен приклад коду має кнопку «▶ Запустити»: результат одразу під ним.</p></div>
     <div class="cd"><div class="i">🧪</div><h4>Експериментуй</h4><p>У блоках «Спробуй сам» змінюй код і бач результат наживо. Зламати нічого не можна.</p></div>
-    <div class="cd"><div class="i">🏗️</div><h4>Будуй проєкт</h4><p>Наприкінці кожного уроку — крок проєкту «Полиця» і чекліст «Перевір у браузері».</p></div>
+    <div class="cd"><div class="i">🏗️</div><h4>Будуй проєкт</h4><p>Наприкінці кожного уроку — крок проєкту «${M.projectName}» і чекліст «${M.checkTitle}».</p></div>
     <div class="cd"><div class="i">✅</div><h4>Перевіряй себе</h4><p>3 питання після уроку, ${T.length} контрольних з оцінкою за 12-бальною шкалою.</p></div>
   </div>
   <div class="cards" style="margin-top:20px">
-    <a class="cd" href="#tools" style="text-decoration:none;background:var(--ink);color:#fff;border:0"><div class="i">🛠️</div><h4>Спершу налаштуй робоче місце</h4><p style="color:#C9C5D6">VS Code, браузер, GitHub: однаково в школі й удома →</p></a>
-    <a class="cd" href="#lesson-1" style="text-decoration:none;background:#F0622E;color:#fff;border:0"><div class="i">🚀</div><h4>Почати з уроку 1</h4><p style="color:#FFE3D6">Як влаштований веб. Перша сторінка →</p></a>
+    <a class="cd" href="#tools" style="text-decoration:none;background:var(--ink);color:#fff;border:0"><div class="i">🛠️</div><h4>Спершу налаштуй робоче місце</h4><p style="color:#C9C5D6">${M.workCard}</p></a>
+    <a class="cd" href="#lesson-1" style="text-decoration:none;background:#F0622E;color:#fff;border:0"><div class="i">🚀</div><h4>Почати з уроку 1</h4><p style="color:#FFE3D6">${L[0].title} →</p></a>
   </div>`;
   $('#view').innerHTML = h;
 }
@@ -472,12 +627,12 @@ function lessonView(n){
   const prev = L.find(x => x.n === n - 1), next = L.find(x => x.n === n + 1);
   const test = T.find(t => t.after === n);
   let h = `<div class="lh"><span class="crumb">${b.icon} Урок ${l.n} з ${L.length} · ${b.name}</span><h1>${l.title}</h1><p class="sub">${l.sub}</p>
-    <div class="meta"><span>⏱ ${l.mins} хв</span><span>🧩 ${l.sections.filter(s=>s.t==='code'||s.t==='try').length} прикладів коду</span><span>🏠 ${l.hw.length} рівні ДЗ</span></div></div>
+    <div class="meta"><span>⏱ ${l.mins} хв</span><span>🧩 ${l.sections.filter(s=>['code','try','sheet'].includes(s.t)).length} прикладів</span><span>🏠 ${l.hw.length} рівні ДЗ</span></div></div>
     <div class="goals"><h4>Після уроку ти вмієш</h4><ul>${l.goals.map(g=>`<li>${g}</li>`).join('')}</ul></div>
     ${l.terms.length?`<div class="terms"><h4>📘 Ключові поняття уроку</h4><dl>${l.terms.map(t=>`<div><dt>${t.t}</dt><dd>${t.d}</dd></div>`).join('')}</dl><a href="#glossary" class="tl">Весь словник →</a></div>`:''}
     <div class="content">${l.sections.map(secHTML).join('')}</div>
-    <div class="box proj"><h3>🏗️ Крок проєкту «Полиця»</h3><p>${l.project}</p></div>
-    <div class="box check"><h3>🔍 Перевір у браузері</h3><ul>${l.check.map(c=>`<li>${c}</li>`).join('')}</ul></div>
+    <div class="box proj"><h3>🏗️ Крок проєкту «${M.projectName}»</h3><p>${l.project}</p></div>
+    <div class="box check"><h3>🔍 ${M.checkTitle}</h3><ul>${l.check.map(c=>`<li>${c}</li>`).join('')}</ul></div>
     <div class="box hwb"><h3>🏠 Домашнє завдання</h3><div class="hw">${l.hw.map(x=>`<div class="hwi"><b>${x.lvl}</b><div>${x.v}</div></div>`).join('')}</div></div>
     <div class="content"><h2>Самоперевірка</h2></div>${quizHTML(l.quiz, 'l'+n)}
     ${test?`<a class="testban" href="#test-${test.n}"><span class="e">📝</span><div><b>${test.title}</b><span>${test.sub}</span></div></a>`:''}
@@ -509,10 +664,10 @@ function pageView(id){
   if (p.catalog) tagCatalog($('#tcat'));
 }
 
-const KIND = { block: ['Блочний', '#2F6FEB'], inline: ['Рядковий', '#F0622E'], hidden: ['Невидимий', '#6B6878'], 'void-block': ['Одиночний · блочний', '#2F6FEB'], 'void-inline': ['Одиночний · рядковий', '#F0622E'] };
+const KIND = { fx: ['Google Sheets', '#0F9D58'], py: ['Python', '#3776AB'], block: ['Блочний', '#2F6FEB'], inline: ['Рядковий', '#F0622E'], hidden: ['Невидимий', '#6B6878'], 'void-block': ['Одиночний · блочний', '#2F6FEB'], 'void-inline': ['Одиночний · рядковий', '#F0622E'] };
 function tagCatalog(root){
   const G = DATA.tags;
-  root.innerHTML = `<input class="gsearch" id="ts" placeholder="🔍 Пошук тегу… (наприклад: img, посилання, таблиця)">
+  root.innerHTML = `<input class="gsearch" id="ts" placeholder="${(P[(location.hash||'').slice(1)]||{}).searchPh || '🔍 Пошук тегу… (наприклад: img, посилання, таблиця)'}">
     <div class="gfilt">${G.map(g=>`<button data-g="${g.id}" style="--bc:#1D1B26;--bcs:#E7E1D6">${g.name}</button>`).join('')}</div><div id="tl"></div>`;
   let fg = null;
   const draw = () => {
@@ -523,10 +678,10 @@ function tagCatalog(root){
       const items = g.items.filter(t => !q || (t.tag + ' ' + t.name + ' ' + t.why).toLowerCase().includes(q));
       if (!items.length) return;
       h += `<h2 class="gh">${g.name}</h2><p class="tdesc">${g.desc}</p><div class="tcards">${items.map((t,i)=>{
-        const k = KIND[t.kind]; const runnable = t.kind !== 'hidden';
+        const k = KIND[t.kind]; const runnable = t.kind !== 'hidden' && t.kind !== 'fx'; const plang = t.kind === 'py' ? 'python' : t.kind === 'fx' ? 'none' : 'markup';
         return `<div class="tc" data-g="${g.id}" data-i="${g.items.indexOf(t)}"><div class="tch"><code class="tn">${esc(t.tag)}</code><span class="tk" style="color:${k[1]};border-color:${k[1]}">${k[0]}</span><a class="tl2" href="#lesson-${t.n}">урок ${t.n}</a></div>
           <b class="tnm">${t.name}</b><p>${t.why}</p>
-          <div class="code"><div class="ch"><span class="ttl"></span><button class="btn cp">Копіювати</button>${runnable?'<button class="btn run">▶ Показати</button>':''}</div><pre><code class="language-markup">${esc(t.ex)}</code></pre></div></div>`;
+          <div class="code"><div class="ch"><span class="ttl"></span><button class="btn cp">Копіювати</button>${runnable?'<button class="btn run">▶ Показати</button>':''}</div><pre><code class="language-${plang}">${esc(t.ex)}</code></pre>${t.kind==='py'?'<div class="pyout"></div>':''}</div></div>`;
       }).join('')}</div>`;
     });
     $('#tl').innerHTML = h || '<p>Нічого не знайдено 🤷</p>';
@@ -535,7 +690,8 @@ function tagCatalog(root){
       const c = el.querySelector('.code');
       c.querySelector('.cp').onclick = e => copy(t.ex, e.target);
       const rb = c.querySelector('.run');
-      if (rb) rb.onclick = () => {
+      if (rb && t.kind === 'py') rb.onclick = () => pyRun(t.ex, '', c.querySelector('.pyout'));
+      else if (rb) rb.onclick = () => {
         let out = c.querySelector('.out');
         if (!out) { out = document.createElement('div'); out.className = 'out'; out.innerHTML = '<iframe sandbox="allow-scripts allow-forms allow-modals" title="Результат"></iframe><div class="cons"></div>'; c.appendChild(out); }
         runInto(out.querySelector('iframe'), out.querySelector('.cons'), t.ex, 'html', 150);
@@ -612,7 +768,7 @@ function route(keepScroll){
   document.body.classList.remove('open');
   if (!keepScroll) window.scrollTo(0, 0);
   const t = r.startsWith('lesson-') ? L.find(l => 'lesson-'+l.n === r) : null;
-  document.title = t ? `Урок ${t.n}. ${t.title} — Веб-майстерня` : `Веб-майстерня · ${L.length} уроків`;
+  document.title = t ? `Урок ${t.n}. ${t.title} — ${M.brand}` : `${M.brand} · ${L.length} уроків`;
 }
 window.addEventListener('hashchange', () => route(false));
 $('#menu').onclick = () => document.body.classList.toggle('open');

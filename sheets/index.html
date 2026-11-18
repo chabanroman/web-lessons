@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Курс</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF8F3; --paper:#fff; --ink:#1D1B26; --muted:#6B6878; --line:#E7E1D6; --soft:#F4EFE6;
+  --c:#F0622E; --cs:#FFE3D6;
+  --r:18px; --side:300px;
+  --code-bg:#1D1B26;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.65 'Golos Text',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,.brand{font-family:'Unbounded','Golos Text',sans-serif;letter-spacing:-.01em;line-height:1.2}
+code,kbd,pre,textarea.ed{font-family:'JetBrains Mono',ui-monospace,monospace}
+:not(pre)>code{background:var(--soft);border:1px solid var(--line);padding:1px 6px;border-radius:6px;font-size:.86em;white-space:nowrap}
+kbd{background:#fff;border:1px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:0 6px;font-size:.82em}
+
+/* layout */
+.side{position:fixed;inset:0 auto 0 0;width:var(--side);background:var(--paper);border-right:1px solid var(--line);overflow-y:auto;z-index:20;padding:22px 16px 40px;transition:transform .25s}
+.main{margin-left:var(--side);min-height:100vh}
+.wrap{max-width:860px;margin:0 auto;padding:40px 28px 100px}
+.topbar{display:none}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;text-decoration:none;padding:4px 8px 18px}
+.logo{width:38px;height:38px;border-radius:12px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:15px;font-family:'JetBrains Mono',monospace;font-weight:600}
+.nav-links a{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px}
+.nav-links a:hover{background:var(--soft)}
+.nav-links a.on{background:var(--ink);color:#fff}
+.prog{margin:14px 8px 6px;font-size:13px;color:var(--muted)}
+.bar{height:8px;background:var(--soft);border-radius:99px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#F0622E,#2F6FEB,#D99A00,#18A058,#8B5CF6);border-radius:99px;transition:width .4s}
+.nb{margin-top:18px}
+.nb-h{display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.nb-h span{width:10px;height:10px;border-radius:3px}
+.nl{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:10px;text-decoration:none;font-size:14.5px;line-height:1.3}
+.nl:hover{background:var(--soft)}
+.nl .num{flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--soft);color:var(--muted)}
+.nl.done .num{background:var(--bc);color:#fff}
+.nl.on{background:var(--bcs)}
+.nl.on .num{outline:2px solid var(--bc)}
+.nl.test .num{background:transparent;font-size:15px}
+
+/* hero */
+.hero{position:relative;background:var(--ink);color:#fff;border-radius:28px;padding:46px 40px;overflow:hidden}
+.hero h1{font-size:clamp(30px,5vw,50px);margin:0 0 14px;font-weight:800}
+.hero p{font-size:19px;opacity:.85;max-width:560px;margin:0}
+.hero .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:26px}
+.hero .tags b{padding:6px 14px;border-radius:99px;font-size:14px;font-weight:700}
+.hero .deco{position:absolute;right:-20px;top:-10px;font:600 15px/1.5 'JetBrains Mono',monospace;opacity:.13;white-space:pre;pointer-events:none}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0 34px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.stat b{display:block;font:800 28px 'Unbounded',sans-serif}
+.stat span{font-size:14px;color:var(--muted)}
+.road{display:grid;gap:14px}
+.rb{background:var(--paper);border:1px solid var(--line);border-left:6px solid var(--bc);border-radius:var(--r);padding:18px 20px}
+.rb h3{margin:0;font-size:18px;display:flex;gap:10px;align-items:center}
+.rb small{color:var(--muted);font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px 5px 6px;border-radius:99px;background:var(--bcs);text-decoration:none;font-size:14px;font-weight:500}
+.chip i{font-style:normal;width:22px;height:22px;border-radius:99px;background:var(--bc);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
+.chip.t{background:var(--ink);color:#fff}
+.chip.t i{background:#fff;color:var(--ink)}
+
+/* lesson */
+.crumb{display:inline-flex;gap:8px;align-items:center;padding:6px 14px;border-radius:99px;background:var(--cs);color:var(--c);font-weight:800;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+.lh h1{font-size:clamp(28px,4.2vw,42px);margin:16px 0 10px;font-weight:800}
+.lh .sub{font-size:19px;color:var(--muted);margin:0}
+.meta{display:flex;gap:16px;margin-top:14px;font-size:14px;color:var(--muted);flex-wrap:wrap}
+.goals{margin:28px 0 10px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:18px 22px}
+.goals h4{margin:0 0 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--c)}
+.goals ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}
+.goals li{padding-left:26px;position:relative;font-size:15.5px}
+.goals li:before{content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:6px;background:var(--c);color:#fff;font-size:11px;display:grid;place-items:center;margin-top:3px;font-weight:800}
+.content h2{font-size:24px;margin:44px 0 12px;font-weight:700;display:flex;gap:12px;align-items:center}
+.content h2:before{content:"";width:8px;height:26px;border-radius:4px;background:var(--c)}
+.content p{margin:12px 0}
+.content ul.list{padding-left:0;list-style:none}
+.content ul.list li{padding:8px 0 8px 22px;position:relative;border-bottom:1px dashed var(--line)}
+.content ul.list li:before{content:"";position:absolute;left:4px;top:18px;width:7px;height:7px;border-radius:99px;background:var(--c)}
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:16px 0}
+ol.steps li{counter-increment:s;position:relative;padding:12px 16px 12px 58px;background:var(--paper);border:1px solid var(--line);border-radius:14px;margin-bottom:8px}
+ol.steps li:before{content:counter(s);position:absolute;left:14px;top:12px;width:30px;height:30px;border-radius:10px;background:var(--c);color:#fff;font-weight:800;display:grid;place-items:center;font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0}
+.cd{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.cd .i{font-size:28px}
+.cd h4{margin:6px 0 4px;font-size:16px}
+.cd p{margin:0;font-size:15px;color:var(--muted)}
+.tbl{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:14px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th{background:var(--soft);text-align:left;font-weight:700;padding:10px 14px;white-space:nowrap}
+td{padding:10px 14px;border-top:1px solid var(--line);vertical-align:top}
+.call{display:flex;gap:14px;padding:16px 18px;border-radius:var(--r);margin:18px 0;font-size:16px}
+.call .ci{font-size:22px;line-height:1.3}
+.call p{margin:0}
+.call.tip{background:#E8F1FF;border:1px solid #C9DBFF}
+.call.warn{background:#FFF1E6;border:1px solid #FFD2B3}
+.call.idea{background:#F1ECFF;border:1px solid #DCD0FF}
+figure.fig{margin:22px 0;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+figure.fig svg{width:100%;height:auto;display:block}
+figure.fig figcaption{font-size:14px;color:var(--muted);text-align:center;margin-top:10px}
+
+/* code */
+.code{margin:18px 0;border-radius:16px;overflow:hidden;background:var(--code-bg);box-shadow:0 10px 30px rgba(29,27,38,.12)}
+.ch{display:flex;align-items:center;gap:10px;padding:9px 12px 9px 16px;background:#2A2835;color:#C9C5D6;font-size:13px}
+.ch .dots{display:flex;gap:6px}.ch .dots i{width:10px;height:10px;border-radius:99px;background:#4A4757}
+.ch .ttl{font-family:'JetBrains Mono',monospace;flex:1}
+.ch .lang{text-transform:uppercase;font-size:11px;letter-spacing:.08em;font-weight:700;color:#8F8AA0}
+.btn{border:none;cursor:pointer;font:600 13px 'Golos Text',sans-serif;border-radius:9px;padding:6px 12px;background:#3A3746;color:#fff;transition:.15s}
+.btn:hover{background:#4A4757}
+.btn.run{background:var(--c);color:#fff}
+.btn.run:hover{filter:brightness(1.1)}
+pre{margin:0;padding:16px 18px;overflow-x:auto;color:#EDEAF5;font-size:14px;line-height:1.6;tab-size:2}
+pre code{font-family:inherit}
+.note{font-size:14.5px;color:var(--muted);margin:-8px 4px 18px}
+.out{background:#fff;border-top:3px solid var(--c)}
+.out iframe{width:100%;height:240px;border:0;display:block;background:#fff}
+.cons{background:#16151C;color:#C9F7D9;font:13px/1.6 'JetBrains Mono',monospace;padding:10px 16px;max-height:200px;overflow:auto;display:none}
+.cons.has{display:block}
+.cons div{white-space:pre-wrap;border-bottom:1px solid #2A2835;padding:2px 0}
+.cons .e{color:#FF9B9B}.cons .w{color:#FFD58A}.cons .a{color:#A5C8FF}
+.cons .lbl{color:#6B6878;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+/* playground */
+.play{margin:22px 0;border:2px solid var(--c);border-radius:20px;overflow:hidden;background:var(--paper)}
+.ph{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--c);color:#fff;font-weight:700}
+.ph span{flex:1}
+.ph .btn{background:rgba(255,255,255,.22)}
+.ph .btn:hover{background:rgba(255,255,255,.35)}
+.pg{display:grid;grid-template-columns:1fr 1fr;min-height:280px}
+textarea.ed{white-space:pre;overflow:auto;border:0;resize:vertical;min-height:280px;padding:14px 16px;background:var(--code-bg);color:#EDEAF5;font-size:14px;line-height:1.6;outline:none;tab-size:2}
+.pg iframe{width:100%;height:100%;min-height:280px;border:0;background:#fff}
+
+/* boxes */
+.box{border-radius:22px;padding:22px 24px;margin:34px 0 0}
+.box h3{margin:0 0 10px;font-size:19px;display:flex;gap:10px;align-items:center}
+.box.proj{background:var(--ink);color:#fff}
+.box.proj p{margin:0;opacity:.92}
+.box.proj code{background:#2F2D3A;border-color:#3A3746;color:#fff}
+.box.check{background:var(--paper);border:2px dashed var(--c)}
+.box.check ul{margin:0;padding:0;list-style:none}
+.box.check li{padding:6px 0 6px 30px;position:relative}
+.box.check li:before{content:"🔍";position:absolute;left:0;top:5px}
+.hw{display:grid;gap:10px}
+.hwi{display:flex;gap:14px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.hwi b{flex:none;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:8px;background:var(--cs);color:var(--c);height:fit-content;white-space:nowrap}
+.box.hwb{background:var(--soft)}
+
+/* quiz */
+.quiz{display:grid;gap:14px}
+.qq{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.qq h4{margin:0 0 12px;font-size:16.5px;font-weight:700}
+.qq h4 small{color:var(--c);font-weight:800;margin-right:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:2px solid var(--line);border-radius:12px;margin:6px 0;cursor:pointer;font-size:15.5px;transition:.12s}
+.opt:hover{border-color:var(--c)}
+.opt input{margin-top:5px;accent-color:var(--c)}
+.opt.ok{border-color:#18A058;background:#E9F9EF}
+.opt.bad{border-color:#E5484D;background:#FFEDEE}
+.why{display:none;margin-top:8px;font-size:14.5px;color:var(--muted)}
+.checked .why{display:block}
+.qbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.bigbtn{border:none;cursor:pointer;font:700 16px 'Golos Text',sans-serif;border-radius:14px;padding:13px 22px;background:var(--c);color:#fff;transition:.15s}
+.bigbtn:hover{transform:translateY(-2px)}
+.bigbtn.ghost{background:var(--paper);color:var(--ink);border:2px solid var(--line)}
+.score{display:none;align-items:center;gap:18px;background:var(--ink);color:#fff;border-radius:18px;padding:18px 22px;margin-top:14px}
+.score.on{display:flex}
+.score .big{font:800 40px 'Unbounded',sans-serif;color:var(--c)}
+.score p{margin:0}
+
+.terms{margin:14px 0 10px;background:var(--cs);border-radius:var(--r);padding:18px 22px}
+.terms h4{margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--c)}
+.terms dl{margin:0;display:grid;gap:8px}
+.terms dl div{background:var(--paper);border-radius:12px;padding:10px 14px}
+.terms dt{font-weight:800;font-size:15.5px}
+.terms dd{margin:2px 0 0;font-size:15px;color:#3E3B49}
+.terms .tl{display:inline-block;margin-top:10px;font-size:14px;font-weight:700;color:var(--c);text-decoration:none}
+.gsearch{width:100%;margin-top:22px;padding:14px 18px;border-radius:14px;border:2px solid var(--line);font:500 17px 'Golos Text',sans-serif;background:var(--paper);outline:none}
+.gsearch:focus{border-color:var(--c)}
+.gfilt{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.gfilt button{border:2px solid var(--bcs);background:var(--paper);border-radius:99px;padding:6px 14px;font:600 14px 'Golos Text',sans-serif;cursor:pointer}
+.gfilt button.on{background:var(--bc);border-color:var(--bc);color:#fff}
+.gh{font-size:22px;margin:34px 0 12px}
+.gterms{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.gt{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--bc);border-radius:14px;padding:12px 14px}
+.gt .gtop{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.gt .gtop a{flex:none;font-size:12px;font-weight:700;background:var(--bcs);color:var(--bc);padding:2px 8px;border-radius:99px;text-decoration:none}
+.gt p{margin:6px 0 0;font-size:15px;color:#3E3B49;line-height:1.5}
+.hwl{background:var(--paper);border:1px solid var(--line);border-left:5px solid var(--bc);border-radius:16px;padding:14px 18px;margin-bottom:12px}
+.hwh a{display:flex;gap:10px;align-items:center;font-weight:800;text-decoration:none;font-size:16.5px}
+.hwh i{font-style:normal;width:28px;height:28px;border-radius:9px;background:var(--bc);color:#fff;display:grid;place-items:center;font-size:13px;flex:none}
+.hwp{font-size:14.5px;color:var(--muted);margin:8px 0 6px}
+.hwc{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px dashed var(--line);font-size:15px;cursor:pointer}
+.hwc input{margin-top:5px;accent-color:var(--bc);width:17px;height:17px;flex:none}
+.hwc b{flex:none;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:7px;background:var(--bcs);color:var(--bc);margin-top:2px}
+.hwc input:checked ~ span{text-decoration:line-through;opacity:.55}
+.tdesc{color:var(--muted);margin:-4px 0 14px;font-size:15.5px}
+.tcards{display:grid;gap:12px}
+.tc{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+.tch{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tc code.tn{font-size:17px;font-weight:600;background:#1D1B26;color:#FF8F6B;border:0;padding:3px 10px;white-space:nowrap}
+.tk{font-size:12px;font-weight:700;border:1.5px solid;border-radius:99px;padding:1px 9px}
+.tl2{margin-left:auto;font-size:12px;font-weight:700;background:var(--soft);padding:2px 9px;border-radius:99px;text-decoration:none;color:var(--muted)}
+.tnm{display:block;margin-top:10px;font-size:16.5px}
+.tc p{margin:4px 0 10px;font-size:15.5px;color:#3E3B49}
+.tc .code{margin:0}
+.tc pre{font-size:13.5px;padding:12px 16px}
+.tc .ch{padding:6px 10px}
+.tc .out iframe{height:150px}
+.pyout{display:none;background:#16151C;color:#E6E3F0;font:13.5px/1.55 'JetBrains Mono',monospace;padding:12px 16px;border-top:3px solid #3776AB;max-height:420px;overflow:auto}
+.pyout.on{display:block}
+.pyout div{white-space:pre-wrap;word-break:break-word}
+.pyout .perr{color:#FF9B9B}.pyout .pinfo{color:#8F8AA0}
+.pyout img{display:block;max-width:100%;background:#fff;border-radius:8px;margin:8px 0}
+.pin{background:#22202B;padding:8px 14px 10px;border-top:1px solid #34313F}
+.pin label{display:block;color:#A9A4B8;font-size:12px;margin-bottom:4px}
+.pin textarea{width:100%;background:#16151C;color:#FFD166;border:1px solid #34313F;border-radius:8px;font:13px 'JetBrains Mono',monospace;padding:6px 8px;resize:vertical}
+.play.py .pg{grid-template-columns:1.1fr 1fr}
+.play.py .pl{display:flex;flex-direction:column;background:var(--code-bg)}
+.play.py .pl textarea.ed{flex:1}
+.play.py .pyout{max-height:none;min-height:280px;border-top:0}
+.sheet{margin:20px 0;background:#fff;border:1px solid #DADCE0;border-radius:12px;overflow:hidden;font-family:Arial,'Golos Text',sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.sbar{display:flex;align-items:center;gap:10px;padding:6px 10px;border-bottom:1px solid #DADCE0;font-size:13.5px;background:#F8F9FA}
+.sref{min-width:46px;padding:2px 8px;border:1px solid #DADCE0;border-radius:4px;background:#fff;font-weight:600;color:#3C4043}
+.sfx{color:#80868B;font-style:italic;font-weight:700}
+.sf{font-family:'JetBrains Mono',monospace;color:#1D1B26}
+.swrap{overflow-x:auto}
+.sheet table{border-collapse:collapse;width:100%;font-size:13.5px}
+.sheet thead th,.sheet tbody th{background:#F8F9FA;color:#5F6368;font-weight:500;font-size:12px;border:1px solid #E2E3E3;padding:3px 8px;text-align:center;min-width:28px}
+.sheet th.son{background:#D3E3FD;color:#0B57D0}
+.sheet td{border:1px solid #E2E3E3;padding:5px 9px;white-space:nowrap;color:#202124}
+.sheet td.snum{text-align:right}
+.sheet td.shd{font-weight:700;background:#F1F3F4}
+.sheet td.hg{background:#CEEAD6}.sheet td.hr{background:#FAD2CF}.sheet td.hy{background:#FEEFC3}.sheet td.hb{background:#D2E3FC}
+.sheet td.ssel{outline:2px solid #1A73E8;outline-offset:-2px}
+.stab{display:flex;background:#F8F9FA;border-top:1px solid #DADCE0;padding:0 10px}
+.stab span{font-size:13px;padding:6px 14px;background:#fff;border-left:1px solid #DADCE0;border-right:1px solid #DADCE0;color:#188038;font-weight:600;border-bottom:3px solid #188038}
+.sheet figcaption{font-size:14px;color:var(--muted);padding:10px 14px;border-top:1px solid #EEE;font-family:'Golos Text',sans-serif}
+.donebar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:40px;padding:18px 20px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);flex-wrap:wrap}
+.done-btn.is{background:#18A058}
+.pn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.pn a{display:block;padding:16px 18px;border-radius:var(--r);background:var(--paper);border:1px solid var(--line);text-decoration:none}
+.pn a:hover{border-color:var(--c)}
+.pn small{color:var(--muted);display:block;font-size:13px}
+.pn b{font-size:15.5px}
+.pn .nx{text-align:right}
+.testban{display:flex;gap:16px;align-items:center;margin-top:24px;padding:20px 22px;border-radius:var(--r);background:var(--ink);color:#fff;text-decoration:none}
+.testban .e{font-size:34px}
+.testban b{display:block;font-size:17px}
+.testban span{opacity:.75;font-size:14px}
+.demo{border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:0 20px 50px rgba(29,27,38,.12);margin:18px 0;background:#fff}
+.demo .bb{display:flex;gap:6px;align-items:center;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.demo .bb i{width:11px;height:11px;border-radius:99px;background:#E7E1D6}
+.demo .bb span{margin-left:10px;background:#fff;border-radius:8px;padding:2px 12px;flex:1;max-width:340px}
+.demo iframe{width:100%;height:620px;border:0;display:block}
+
+/* prism tokens */
+.token.comment,.token.prolog,.token.doctype,.token.cdata{color:#8F8AA0;font-style:italic}
+.token.punctuation{color:#C9C5D6}
+.token.tag,.token.selector,.token.keyword,.token.important{color:#FF8F6B}
+.token.attr-name,.token.property,.token.function{color:#FFD166}
+.token.attr-value,.token.string,.token.url{color:#7EE2A8}
+.token.number,.token.boolean,.token.constant{color:#B79BFF}
+.token.operator,.token.entity{color:#7FB0FF}
+.token.class-name,.token.builtin{color:#7FB0FF}
+
+@media (max-width:980px){
+  .side{transform:translateX(-105%)}
+  body.open .side{transform:none;box-shadow:20px 0 60px rgba(0,0,0,.15)}
+  :not(pre)>code{white-space:normal;word-break:break-word}
+  .main{margin-left:0}
+  .topbar{display:flex;position:sticky;top:0;z-index:15;align-items:center;gap:12px;padding:10px 16px;background:rgba(251,248,243,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .topbar button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px 12px;font:600 15px 'Golos Text',sans-serif;cursor:pointer}
+  .topbar .brand{padding:0;font-size:16px}
+  .topbar .logo{width:30px;height:30px;font-size:12px}
+  .wrap{padding:24px 16px 80px}
+  .stats{grid-template-columns:1fr 1fr}
+  .goals ul{grid-template-columns:1fr}
+  .pg,.play.py .pg{grid-template-columns:1fr}
+  .hero{padding:32px 24px}
+  .pn{grid-template-columns:1fr}
+  .demo iframe{height:560px}
+}
+</style>
+</head>
+<body>
+<aside class="side" id="side"></aside>
+<div class="main">
+  <div class="topbar"><button id="menu">☰ Уроки</button><a class="brand" href="#home"><span class="logo">&lt;/&gt;</span>Веб-майстерня</a></div>
+  <div class="wrap" id="view"></div>
+</div>
+<script>window.Prism = window.Prism || {}; window.Prism.manual = true;</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script>
+const DATA = {"meta": {"brand": "Таблиці-майстерня", "logo": "fx", "kicker": "Курс Google Sheets", "hero": "Від першої клітинки до дашборду, що оновлюється сам. Формули, логіка, пошук, діаграми, зведені таблиці, Google Forms і автоматизація. Крок за кроком, з наочними прикладами.", "deco": "=SUM(D2:D30)\n=IF(E2>=8;\"ок\";\"⚠️\")\n=XLOOKUP(A2;Учні!A:A;Учні!F:F)\n=QUERY(A1:F;\"select B, avg(E)\n  group by B\")\n=UNIQUE(C2:C)", "projectName": "Наш клас у цифрах", "projectBlurb": "Наскрізний проєкт «Наш клас у цифрах»: опитування в Google Forms → таблиця з формулами → аналіз → дашборд, що оновлюється сам.", "checkTitle": "Перевір себе", "workCard": "Google-акаунт, налаштування регіону, школа ↔ дім →", "nav": [["tools", "🛠️ Де працювати"], ["project", "📊 Проєкт «Наш клас у цифрах»"], ["ref", "📗 Довідник функцій"], ["glossary", "📘 Словник термінів"], ["homework", "🏠 Домашні завдання"]]}, "files": {}, "tags": [{"id": "math", "name": "🧮 Обчислення", "desc": "Основні функції для підрахунків.", "items": [{"tag": "SUM", "name": "Сума", "why": "Додає всі числа діапазону.", "ex": "=SUM(D2:D30)", "n": 4, "kind": "fx"}, {"tag": "AVERAGE", "name": "Середнє", "why": "Середнє арифметичне чисел.", "ex": "=AVERAGE(E2:E30)", "n": 4, "kind": "fx"}, {"tag": "MIN / MAX", "name": "Мінімум / максимум", "why": "Найменше / найбільше число.", "ex": "=MIN(F2:F30)\n=MAX(F2:F30)", "n": 4, "kind": "fx"}, {"tag": "COUNT / COUNTA", "name": "Кількість", "why": "COUNT — скільки чисел, COUNTA — скільки непорожніх клітинок.", "ex": "=COUNTA(A2:A30)", "n": 4, "kind": "fx"}, {"tag": "ROUND", "name": "Округлення", "why": "Округлює до заданої кількості знаків.", "ex": "=ROUND(AVERAGE(E2:E30); 1)", "n": 4, "kind": "fx"}, {"tag": "MEDIAN", "name": "Медіана", "why": "Середній елемент упорядкованого ряду.", "ex": "=MEDIAN(D2:D30)", "n": 4, "kind": "fx"}, {"tag": "RANK", "name": "Місце в рейтингу", "why": "Місце значення серед інших (1 = найбільше).", "ex": "=RANK(F2; $F$2:$F$30)", "n": 4, "kind": "fx"}]}, {"id": "logic", "name": "🔀 Логіка й умови", "desc": "Рішення й підрахунки за умовою.", "items": [{"tag": "IF", "name": "Якщо… то… інакше", "why": "Повертає одне з двох значень залежно від умови.", "ex": "=IF(E2>=8; \"ок\"; \"мало сну\")", "n": 5, "kind": "fx"}, {"tag": "AND / OR / NOT", "name": "Логічні оператори", "why": "Поєднують умови: усі / хоча б одна / заперечення.", "ex": "=AND(E2>=8; D2<=5)", "n": 5, "kind": "fx"}, {"tag": "COUNTIF(S)", "name": "Кількість за умовою", "why": "Скільки клітинок відповідає умові (кільком умовам).", "ex": "=COUNTIF(C2:C30; \"Інформатика\")\n=COUNTIFS(B2:B30; \"8-А\"; E2:E30; \">=8\")", "n": 5, "kind": "fx"}, {"tag": "SUMIF / AVERAGEIF", "name": "Сума / середнє за умовою", "why": "Підсумовує лише рядки, що відповідають умові.", "ex": "=AVERAGEIF(B2:B30; \"8-Б\"; E2:E30)", "n": 5, "kind": "fx"}, {"tag": "IFERROR", "name": "Без помилок", "why": "Показує своє значення замість помилки.", "ex": "=IFERROR(A2/B2; 0)", "n": 7, "kind": "fx"}]}, {"id": "lookup", "name": "🔎 Пошук", "desc": "Знайти дані в іншій таблиці чи аркуші.", "items": [{"tag": "XLOOKUP", "name": "Сучасний пошук", "why": "Шукає значення й повертає відповідне з іншого стовпця.", "ex": "=XLOOKUP(\"Віка\"; A2:A30; F2:F30; \"не знайдено\")", "n": 7, "kind": "fx"}, {"tag": "VLOOKUP", "name": "Класичний пошук", "why": "Шукає в першому стовпці діапазону, повертає з N-го. FALSE = точний збіг.", "ex": "=VLOOKUP(\"Віка\"; A2:F30; 6; FALSE)", "n": 7, "kind": "fx"}, {"tag": "INDEX + MATCH", "name": "Гнучкий пошук", "why": "MATCH знаходить позицію, INDEX бере значення з неї.", "ex": "=INDEX(F2:F30; MATCH(\"Віка\"; A2:A30; 0))", "n": 7, "kind": "fx"}]}, {"id": "text", "name": "🔤 Текст і дати", "desc": "Робота з рядками й датами.", "items": [{"tag": "&, TEXTJOIN", "name": "Склеювання", "why": "Об'єднує текст.", "ex": "=A2 & \" з \" & B2\n=TEXTJOIN(\", \"; TRUE; A2:A6)", "n": 8, "kind": "fx"}, {"tag": "UPPER / LOWER / PROPER", "name": "Регістр", "why": "ВЕЛИКІ / маленькі / Кожне Слово З Великої.", "ex": "=PROPER(\"тарас шевченко\")", "n": 8, "kind": "fx"}, {"tag": "LEFT / RIGHT / LEN", "name": "Частина тексту", "why": "Перші / останні N символів, довжина.", "ex": "=LEFT(A2; 1)\n=LEN(A2)", "n": 8, "kind": "fx"}, {"tag": "TRIM / SUBSTITUTE", "name": "Очищення", "why": "Прибрати пробіли / замінити текст.", "ex": "=SUBSTITUTE(TRIM(B2); \"8а\"; \"8-А\")", "n": 8, "kind": "fx"}, {"tag": "SPLIT", "name": "Розбити", "why": "Розділяє текст на кілька клітинок.", "ex": "=SPLIT(\"Шевченко Тарас\"; \" \")", "n": 8, "kind": "fx"}, {"tag": "TODAY / DATE / DATEDIF", "name": "Дати", "why": "Сьогодні, дата з частин, різниця в роках/місяцях/днях.", "ex": "=DATEDIF(B2; TODAY(); \"Y\")", "n": 8, "kind": "fx"}]}, {"id": "arrays", "name": "⚡ Суперфункції", "desc": "Повертають цілі таблиці результатів.", "items": [{"tag": "UNIQUE", "name": "Без повторів", "why": "Список унікальних значень.", "ex": "=UNIQUE(C2:C100)", "n": 12, "kind": "fx"}, {"tag": "SORT", "name": "Сортування формулою", "why": "Повертає відсортовану копію даних.", "ex": "=SORT(A2:F100; 5; FALSE)", "n": 12, "kind": "fx"}, {"tag": "FILTER", "name": "Фільтр формулою", "why": "Лише рядки, що відповідають умові.", "ex": "=FILTER(A2:F100; E2:E100<7)", "n": 12, "kind": "fx"}, {"tag": "QUERY", "name": "Запит", "why": "SQL-подібний запит до таблиці.", "ex": "=QUERY(A1:F100; \"select B, avg(E) group by B\")", "n": 12, "kind": "fx"}, {"tag": "IMPORTRANGE", "name": "Дані з іншої таблиці", "why": "Підтягує діапазон з іншої Google-таблиці.", "ex": "=IMPORTRANGE(\"посилання\"; \"Учні!A1:F100\")", "n": 13, "kind": "fx"}, {"tag": "GOOGLETRANSLATE", "name": "Переклад", "why": "Перекладає текст.", "ex": "=GOOGLETRANSLATE(A2; \"uk\"; \"en\")", "n": 13, "kind": "fx"}, {"tag": "SPARKLINE", "name": "Міні-графік", "why": "Маленький графік у клітинці.", "ex": "=SPARKLINE(B2:F2)", "n": 9, "kind": "fx"}]}], "blocks": [{"id": "sheets", "name": "Основи", "sub": "Таблиці, формати, формули", "icon": "📗", "color": "#0F9D58", "soft": "#D7F5E3"}, {"id": "sheets2", "name": "Пошук і аналіз", "sub": "Текст, дати, діаграми, зведені", "icon": "📊", "color": "#1A73E8", "soft": "#DCE8FF"}, {"id": "sheets3", "name": "Дані й проєкт", "sub": "Forms, QUERY, автоматизація", "icon": "🚀", "color": "#8B5CF6", "soft": "#EDE5FF"}], "lessons": [{"n": 1, "block": "sheets", "title": "Електронні таблиці: перше знайомство", "sub": "Що таке Google Sheets, як влаштована таблиця і чому нею користуються від школи до NASA.", "goals": ["пояснити, що таке електронна таблиця і де вона потрібна", "орієнтуватися в інтерфейсі Google Sheets", "називати клітинки за адресою (B3)", "вводити дані різних типів і ділитися таблицею"], "sections": [{"t": "h", "v": "Навіщо таблиці?"}, {"t": "p", "v": "Електронна таблиця — це «зошит у клітинку», який сам рахує. Вчителі ведуть у них оцінки, магазини — товари, спортсмени — тренування, науковці — результати дослідів. А ще таблиця — найпростіша <b>база даних<\/b>, з якою ми потім працюватимемо в Python."}, {"t": "cards", "v": [{"i": "🧮", "h": "Рахує сама", "p": "Змінив одне число — усі суми й середні перерахувались миттєво."}, {"i": "📊", "h": "Показує", "p": "Кілька кліків, і з чисел виходить діаграма."}, {"i": "👥", "h": "Разом", "p": "Google Sheets працює в браузері: весь клас може заповнювати одну таблицю одночасно."}]}, {"t": "h", "v": "Як влаштована таблиця"}, {"t": "sheet", "rows": [["Ім'я", "Клас", "Предмет", "Ігри, год/тижд", "Сон, год", "Математика"], ["Аня", "8-А", "Біологія", "3", "8", "10"], ["Богдан", "8-А", "Інформатика", "10", "7", "9"], ["Віка", "8-Б", "Малювання", "2", "9", "11"], ["Денис", "8-Б", "Фізкультура", "12", "6", "7"], ["Олена", "8-А", "Інформатика", "5", "8", "12"]], "f": "Богдан", "sel": "A3", "hl": {"A3": "b"}, "cap": "Стовпці позначені літерами (A, B, C…), рядки — числами. Клітинка на перетині має адресу: A3 — це «Богдан».", "name": "Аркуш1"}, {"t": "table", "head": ["Поняття", "Що це", "Приклад"], "rows": [["Клітинка", "Одна «коробочка» з даними", "C2 = «Біологія»"], ["Адреса", "Літера стовпця + номер рядка", "B4, F6"], ["Діапазон", "Прямокутник клітинок: від : до", "D2:D6 — усі години ігор"], ["Рядок формул", "Поле зверху: показує, що насправді в клітинці", "=SUM(D2:D6)"], ["Аркуш", "Окрема «сторінка» таблиці внизу екрана", "Аркуш1, Оцінки"]]}, {"t": "h", "v": "Створюємо першу таблицю"}, {"t": "steps", "v": ["Відкрий <a href='https://sheets.google.com' target='_blank'>sheets.google.com<\/a> і увійди в Google-акаунт (шкільний або свій).", "Натисни <b>+ Порожня таблиця<\/b>. Клацни на «Таблиця без назви» вгорі й назви її «Мій клас».", "Перший рядок — <b>заголовки<\/b>: Ім'я, Клас, Предмет… Зроби їх жирними (<kbd>Ctrl<\/kbd>+<kbd>B<\/kbd>).", "Заповни 5+ рядків даних. <kbd>Tab<\/kbd> — наступна клітинка праворуч, <kbd>Enter<\/kbd> — вниз.", "Зберігати не треба: Google Sheets зберігає кожну зміну автоматично ☁️."]}, {"t": "h", "v": "Типи даних"}, {"t": "table", "head": ["Тип", "Приклад", "Як розпізнати"], "rows": [["Текст", "Богдан, 8-А", "Притиснутий до лівого краю"], ["Число", "12, 7,5", "Притиснуте до правого краю"], ["Дата", "01.09.2026", "Можна віднімати: скільки днів між датами"], ["Логічне", "TRUE / FALSE", "Результат перевірки або прапорець ☑"]]}, {"t": "warn", "v": "Число, притиснуте вліво, — тривожний знак: таблиця вважає його текстом і не зможе з ним рахувати. Часта причина — пробіл або крапка замість коми (<code>7.5<\/code> замість <code>7,5<\/code> в українських налаштуваннях)."}, {"t": "h", "v": "Спільний доступ"}, {"t": "p", "v": "Кнопка <b>Поділитися<\/b> (праворуч угорі) → додай людей або «Усі, хто має посилання». Права: <b>Читач<\/b> (лише дивиться), <b>Коментатор<\/b>, <b>Редактор<\/b> (змінює). Історія змін — <b>Файл → Історія версій<\/b>: видно, хто що змінив, і можна все повернути."}], "project": "Створи таблицю «Дослідження класу» з аркушем «Учні»: Ім'я, Клас, Улюблений предмет, Години ігор на тиждень, Години сну. Заповни 8+ рядків (можна вигадані дані). Поділись з учителем як «Коментатор».", "check": ["Усі числа притиснуті вправо (вони справді числа)", "Заголовки жирні, перший рядок закріплено: Вигляд → Закріпити → 1 рядок", "Учитель отримав посилання й бачить таблицю"], "hw": [{"lvl": "Базовий", "v": "Таблиця «Мій тиждень»: дні тижня, години сну, години на уроки, години на телефон."}, {"lvl": "Середній", "v": "Таблиця «Бюджет на місяць»: категорії витрат і суми. Розфарбуй заголовки й додай межі клітинок."}, {"lvl": "Зірочка ⭐", "v": "Дізнайся, як вставити прапорці (Вставлення → Прапорець), і зроби чек-лист справ на тиждень."}], "quiz": [{"q": "Яка адреса в клітинки на перетині стовпця C і рядка 5?", "o": ["5C", "C5", "C:5", "R5C3"], "a": 1, "w": "Спочатку літера стовпця, потім номер рядка."}, {"q": "Що таке діапазон B2:B10?", "o": ["Дві клітинки", "Усі клітинки від B2 до B10", "Рядок 2", "Аркуш B"], "a": 1, "w": "Двокрапка = «від … до»."}, {"q": "Число в клітинці притиснуте до лівого краю. Що це означає?", "o": ["Все гаразд", "Таблиця вважає його текстом", "Це дата", "Це формула"], "a": 1, "w": "Числа притискаються вправо."}], "mins": 45, "id": "sheets-intro", "terms": [{"t": "Електронна таблиця", "d": "Програма (Google Sheets, Excel), де дані лежать у клітинках і можуть самі перераховуватися формулами.", "n": 1}, {"t": "Клітинка", "d": "Одна «коробочка» таблиці на перетині стовпця й рядка.", "n": 1}, {"t": "Адреса клітинки", "d": "Літера стовпця + номер рядка: B3, F10.", "n": 1}, {"t": "Діапазон", "d": "Прямокутник клітинок, записаний через двокрапку: A2:D10.", "n": 1}, {"t": "Аркуш", "d": "Окрема «сторінка» в таблиці; ярлики аркушів — унизу екрана.", "n": 1}, {"t": "Рядок формул", "d": "Поле над таблицею, що показує справжній вміст клітинки (число чи формулу).", "n": 1}, {"t": "Спільний доступ", "d": "Налаштування, хто може переглядати, коментувати чи редагувати таблицю.", "n": 1}]}, {"n": 2, "block": "sheets", "title": "Введення й оформлення даних", "sub": "Таблиця, яку приємно читати: формати чисел, кольори, межі, ширина стовпців, аркуші й гарячі клавіші.", "goals": ["задавати формат чисел: валюта, відсотки, дати", "оформлювати таблицю: межі, заливка, вирівнювання, перенос", "працювати з рядками, стовпцями й аркушами", "використовувати гарячі клавіші"], "sections": [{"t": "h", "v": "Формат — це не значення"}, {"t": "p", "v": "У клітинці може лежати число <code>0,25<\/code>, а показуватися воно як <b>25%<\/b>, <b>0,25 ₴<\/b> або <b>00:06<\/b>. Формат змінює лише <b>вигляд<\/b>, а рахує таблиця завжди справжнє значення. Подивитися справжнє значення можна в рядку формул."}, {"t": "table", "head": ["Формат", "Як виглядає", "Де"], "rows": [["Число", "1 250,50", "Формат → Число → Число"], ["Валюта", "1 250,50 ₴", "Кнопка <b>₴/$<\/b> на панелі або Формат → Число → Валюта"], ["Відсоток", "25%", "Кнопка <b>%<\/b>"], ["Дата", "18.11.2026", "Формат → Число → Дата"], ["Кількість знаків після коми", "7,5 → 7,50", "Кнопки <b>.0<\/b> та <b>.00<\/b>"]]}, {"t": "sheet", "rows": [["Товар", "Ціна", "Знижка", "Ціна зі знижкою", "Дата"], ["Навушники", "1 050,00 ₴", "20%", "840,00 ₴", "18.11.2026"], ["Мишка", "504,00 ₴", "10%", "453,60 ₴", "19.11.2026"]], "f": "=B2*(1-C2)", "sel": "D2", "hl": {"C2": "y", "D2": "g"}, "cap": "Ціна у форматі валюти, знижка у відсотках. Формула =B2*(1-C2) рахує з «чистими» числами 1050 і 0,2.", "name": "Аркуш1"}, {"t": "h", "v": "Оформлення"}, {"t": "cards", "v": [{"i": "🖌️", "h": "Заливка й колір тексту", "p": "Відро з фарбою й літера A на панелі. Заголовки — темний фон, світлий текст."}, {"i": "▦", "h": "Межі", "p": "Кнопка «Межі»: усі межі для таблиці, товста нижня — для заголовків."}, {"i": "↔️", "h": "Ширина стовпця", "p": "Двічі клацни на межі між літерами стовпців — ширина підбереться під текст."}, {"i": "↵", "h": "Перенесення тексту", "p": "Довгий текст у кілька рядків усередині клітинки: кнопка «Перенесення тексту»."}, {"i": "⬚", "h": "Об'єднати клітинки", "p": "Для заголовка над таблицею. Не об'єднуй клітинки всередині даних — зламаєш сортування."}, {"i": "🎨", "h": "Чергування кольорів", "p": "Формат → Чергування кольорів: «зебра» за один клік."}]}, {"t": "h", "v": "Рядки, стовпці, аркуші"}, {"t": "list", "v": ["Правий клік на номер рядка / літеру стовпця → вставити, видалити, сховати.", "Аркуші внизу: <b>+<\/b> — новий, правий клік — перейменувати, змінити колір, дублювати.", "Перетягни аркуш, щоб змінити порядок.", "Копіювати лише формат: інструмент «Копіювати формат» (валик 🖌) або <kbd>Ctrl<\/kbd>+<kbd>Alt<\/kbd>+<kbd>V<\/kbd>."]}, {"t": "h", "v": "Гарячі клавіші"}, {"t": "table", "head": ["Клавіші", "Дія"], "rows": [["<kbd>Ctrl<\/kbd>+<kbd>Z<\/kbd> / <kbd>Ctrl<\/kbd>+<kbd>Y<\/kbd>", "Скасувати / повторити"], ["<kbd>Ctrl<\/kbd>+<kbd>B<\/kbd>", "Жирний"], ["<kbd>Ctrl<\/kbd>+<kbd>Shift<\/kbd>+<kbd>V<\/kbd>", "Вставити лише значення (без формату)"], ["<kbd>Ctrl<\/kbd>+<kbd>стрілка<\/kbd>", "Стрибнути до краю даних"], ["<kbd>Ctrl<\/kbd>+<kbd>Shift<\/kbd>+<kbd>стрілка<\/kbd>", "Виділити до краю даних"], ["<kbd>Ctrl<\/kbd>+<kbd>;<\/kbd>", "Вставити сьогоднішню дату"], ["<kbd>Ctrl<\/kbd>+<kbd>/<\/kbd>", "Показати всі гарячі клавіші"]]}, {"t": "tip", "v": "Правило гарної таблиці: <b>один рядок = один запис<\/b>, <b>один стовпець = одна властивість<\/b>, без порожніх рядків усередині й без об'єднаних клітинок у даних. Тоді працюватимуть і сортування, і фільтри, і діаграми."}], "project": "Оформи аркуш «Учні»: заголовки з заливкою, межі, «зебра», ширина під текст. Додай аркуш «Довідка» з поясненням, що означає кожен стовпець. Розфарбуй ярлики аркушів.", "check": ["Клацни на клітинку з відсотком: у рядку формул — 0,25, а не 25", "Відсортуй будь-який стовпець — оформлення не «поїхало»", "Таблиця читабельна на телефоні (застосунок Google Sheets)"], "hw": [{"lvl": "Базовий", "v": "Таблиця «Ціни в шкільній їдальні»: формат валюти, межі, заголовок з об'єднаними клітинками над таблицею."}, {"lvl": "Середній", "v": "Розклад уроків з кольорами для різних предметів і датами в правильному форматі."}, {"lvl": "Зірочка ⭐", "v": "Власний формат числа (Формат → Число → Користувацький формат): показуй «7,5 год» замість 7,5."}], "quiz": [{"q": "Що змінює формат числа?", "o": ["Значення в клітинці", "Лише вигляд значення", "Формулу", "Нічого"], "a": 1, "w": "Рахується справжнє значення."}, {"q": "Чому не варто об'єднувати клітинки всередині даних?", "o": ["Це некрасиво", "Ламаються сортування й фільтри", "Таблиця видалиться", "Це платна функція"], "a": 1, "w": "Об'єднання — лише для заголовків."}, {"q": "Яке правило гарної таблиці?", "o": ["Один рядок = один запис, один стовпець = одна властивість", "Більше кольорів", "Усе в одній клітинці", "Порожні рядки між записами"], "a": 0, "w": "Охайна структура = все працює."}], "mins": 45, "id": "format", "terms": [{"t": "Формат числа", "d": "Як показується значення: валюта, відсоток, дата. Змінює лише вигляд, а не саме значення.", "n": 2}, {"t": "Об'єднання клітинок", "d": "Злиття кількох клітинок в одну; лише для заголовків, бо ламає сортування.", "n": 2}]}, {"n": 3, "block": "sheets", "title": "Формули й посилання", "sub": "Таблиця вчиться рахувати: формули, відносні й абсолютні посилання, автозаповнення.", "goals": ["писати формули з посиланнями на клітинки", "використовувати арифметичні оператори й дужки", "протягувати формули автозаповненням", "розрізняти відносні й абсолютні посилання ($)"], "sections": [{"t": "h", "v": "Формула починається зі знака ="}, {"t": "sheet", "rows": [["Предмет", "1 семестр", "2 семестр", "Середнє"], ["Математика", "9", "11", "10"], ["Мова", "8", "10", "9"], ["Інформатика", "12", "12", "12"]], "f": "=(B2+C2)/2", "sel": "D2", "hl": {"B2": "y", "C2": "y", "D2": "g"}, "cap": "Формула посилається на клітинки, а не на числа. Зміниш оцінку в B2 — середнє перерахується саме.", "name": "Аркуш1"}, {"t": "table", "head": ["Дія", "Знак", "Приклад"], "rows": [["Додавання", "+", "=A1+A2"], ["Віднімання", "−", "=B5-B4"], ["Множення", "*", "=C2*1,2"], ["Ділення", "/", "=D2/7"], ["Степінь", "^", "=A1^2"]]}, {"t": "h", "v": "Порядок дій"}, {"t": "p", "v": "Як у математиці: спершу дужки, потім степінь, потім множення й ділення, потім додавання й віднімання. <code>=2+3*4<\/code> = 14, а <code>=(2+3)*4<\/code> = 20."}, {"t": "sheet", "rows": [["Покупка", "Кількість", "Ціна", "Сума"], ["Зошит", "5", "28", "140"], ["Ручка", "3", "15", "45"], ["Разом", "", "", "185"]], "f": "=B2*C2", "sel": "D2", "hl": {"B2": "y", "C2": "y", "D2": "g"}, "cap": "Сума = кількість × ціна. А «Разом» = D2+D3.", "name": "Аркуш1"}, {"t": "h", "v": "Автозаповнення: одна формула на весь стовпець"}, {"t": "p", "v": "Напиши формулу в першому рядку, наведи на синій квадратик у правому нижньому куті клітинки й потягни вниз (або двічі клацни на нього). Посилання зсунуться самі: <code>=B2+C2<\/code> → <code>=B3+C3<\/code> → <code>=B4+C4<\/code>. Такі посилання називають <b>відносними<\/b>."}, {"t": "h", "v": "Абсолютні посилання: знак $"}, {"t": "sheet", "rows": [["Товар", "Ціна, $", "Ціна, грн", "", "Курс"], ["Навушники", "25", "1 050", "", "42"], ["Мишка", "12", "504", "", ""], ["Гра", "30", "1 260", "", ""]], "f": "=B2*$E$2", "sel": "C2", "hl": {"B2": "y", "E2": "r", "C2": "g"}, "cap": "Курс лежить в одній клітинці E2. Знак $ «закріплює» її: при автозаповненні B2 зміниться на B3, B4, а $E$2 — ні.", "name": "Аркуш1"}, {"t": "table", "head": ["Запис", "Що закріплено"], "rows": [["<code>E2<\/code>", "Нічого (відносне)"], ["<code>$E$2<\/code>", "І стовпець, і рядок (абсолютне)"], ["<code>E$2<\/code>", "Лише рядок"], ["<code>$E2<\/code>", "Лише стовпець"]]}, {"t": "tip", "v": "Клавіша <kbd>F4<\/kbd> під час редагування формули перемикає варіанти $ по колу."}], "project": "Додай стовпець «Ігри на день» = години на тиждень / 7 і стовпець «Вільних годин на добу» = 24 − сон − ігри на день. Протягни на всіх учнів. Курс «годин на навчання» винеси в окрему клітинку й використай через $.", "check": ["Клацни на результат — у рядку формул формула, а не число", "Протягни формулу — посилання змінились правильно", "Зміни клітинку з $ — перерахувались усі рядки"], "hw": [{"lvl": "Базовий", "v": "Калькулятор покупок: товари, кількість, ціна, сума кожного й разом."}, {"lvl": "Середній", "v": "Ціни в доларах і гривнях з курсом в одній клітинці ($)."}, {"lvl": "Зірочка ⭐", "v": "Таблиця множення 10×10 однією формулою з мішаними посиланнями ($A2*B$1)."}], "quiz": [{"q": "З чого починається формула?", "o": ["#", "=", "+", "$"], "a": 1, "w": "Знак =."}, {"q": "Чому дорівнює =(2+3)*4?", "o": ["14", "20", "24", "9"], "a": 1, "w": "Спершу дужки."}, {"q": "Навіщо $ у =B2*$E$2?", "o": ["Валюта", "Щоб E2 не зсувалось при автозаповненні", "Помилка", "Округлення"], "a": 1, "w": "Абсолютне посилання."}], "mins": 45, "id": "formulas", "terms": [{"t": "Формула", "d": "Обчислення в клітинці, що починається зі знака =.", "n": 3}, {"t": "Відносне посилання", "d": "Адреса (B2), яка зсувається при копіюванні формули.", "n": 3}, {"t": "Абсолютне посилання", "d": "Адреса із $ ($B$2), яка не змінюється при копіюванні.", "n": 3}, {"t": "Автозаповнення", "d": "Протягування формули чи послідовності за маркер у куті клітинки.", "n": 3}]}, {"n": 4, "block": "sheets", "title": "Функції: SUM, AVERAGE і компанія", "sub": "Готові «рецепти» для підрахунків: сума, середнє, мінімум, максимум, кількість, округлення, рейтинг.", "goals": ["використовувати SUM, AVERAGE, MIN, MAX, COUNT, COUNTA", "округлювати через ROUND", "знаходити медіану й місце в рейтингу", "розуміти будову функції: назва, дужки, аргументи"], "sections": [{"t": "h", "v": "Функції: готові «рецепти»"}, {"t": "code", "lang": "sheets", "v": "=SUM(D2:D6)        сума всіх годин ігор\n=AVERAGE(E2:E6)    середній сон\n=MIN(F2:F6)        найнижча оцінка\n=MAX(F2:F6)        найвища оцінка\n=COUNT(F2:F6)      скільки чисел\n=COUNTA(A2:A6)     скільки непорожніх клітинок (учнів)\n=ROUND(E8; 1)      округлити до 1 знака після коми", "run": false, "title": "Найпотрібніші функції", "note": null}, {"t": "sheet", "rows": [["Ім'я", "Клас", "Предмет", "Ігри, год/тижд", "Сон, год", "Математика"], ["Аня", "8-А", "Біологія", "3", "8", "10"], ["Богдан", "8-А", "Інформатика", "10", "7", "9"], ["Віка", "8-Б", "Малювання", "2", "9", "11"], ["Денис", "8-Б", "Фізкультура", "12", "6", "7"], ["Олена", "8-А", "Інформатика", "5", "8", "12"], ["", "", "Середнє:", "6,4", "7,6", "9,8"]], "f": "=AVERAGE(D2:D6)", "sel": "D7", "hl": {"D2": "y", "D3": "y", "D4": "y", "D5": "y", "D6": "y", "D7": "g"}, "cap": "AVERAGE(D2:D6) — середнє з п'яти клітинок.", "name": "Аркуш1"}, {"t": "tip", "v": "Не пам'ятаєш назву? Почни писати <code>=AV<\/code>, і Sheets підкаже. А кнопка <b>Σ<\/b> на панелі вставляє SUM, AVERAGE та інші за два кліки."}, {"t": "warn", "v": "В українських налаштуваннях аргументи функцій розділяються <b>крапкою з комою<\/b>: <code>=ROUND(A1; 1)<\/code>. Якщо в таблиці регіон «США» — комою: <code>=ROUND(A1, 1)<\/code>. Регіон: Файл → Налаштування."}, {"t": "h", "v": "Будова функції"}, {"t": "p", "v": "<code>=ROUND(AVERAGE(E2:E6); 1)<\/code> — функція всередині функції. Читай зсередини назовні: спочатку AVERAGE рахує середнє, потім ROUND округлює його до 1 знака. <b>Аргументи<\/b> — те, що в дужках, розділені <code>;<\/code>."}, {"t": "h", "v": "Трохи статистики"}, {"t": "code", "lang": "sheets", "v": "=MEDIAN(F2:F30)            медіана: «середній» учень, якщо всіх вишикувати за оцінкою\n=MODE(F2:F30)              мода: найчастіша оцінка\n=RANK(F2; $F$2:$F$30)      місце учня в рейтингу (1 = найкращий)\n=LARGE(F2:F30; 2)          друге найбільше значення\n=PERCENTRANK(F2:F30; F2)   який відсоток учнів має оцінку нижчу", "run": false, "title": null, "note": null}, {"t": "idea", "v": "Чому медіана? Якщо 4 учні грають по 2 години, а один — 40, середнє буде 9,6 години. Це неправда про «типового» учня! Медіана = 2 — набагато чесніше. Середнє «боїться» викидів, медіана — ні."}], "project": "Під таблицею «Учні» зроби блок підсумків: кількість учнів, середнє й медіана для сну та ігор, MIN, MAX. Додай стовпець «Місце» з RANK за оцінкою з математики.", "check": ["Порівняй середнє й медіану для ігор — сильно відрізняються? Чому?", "RANK: у кого 1 місце? Перевір сортуванням", "Усі підсумки округлені до 1 знака"], "hw": [{"lvl": "Базовий", "v": "Таблиця оцінок класу з 3 предметів: середнє, мін, макс для кожного предмета."}, {"lvl": "Середній", "v": "Результати бігу на 100 м: рейтинг (RANK, менший час = краще місце — дізнайся про третій аргумент RANK)."}, {"lvl": "Зірочка ⭐", "v": "Знайди приклад даних, де середнє вводить в оману, а медіана — ні (зарплати, ціни квартир). Поясни в коментарі."}], "quiz": [{"q": "Що поверне =COUNTA(A2:A10), якщо заповнено 6 клітинок?", "o": ["10", "6", "9", "0"], "a": 1, "w": "Кількість непорожніх."}, {"q": "Як округлити середнє до 1 знака?", "o": ["=AVERAGE(ROUND(A1:A9))", "=ROUND(AVERAGE(A1:A9); 1)", "=ROUND1(A1:A9)", "=AVERAGE(A1:A9; 1)"], "a": 1, "w": "Функція у функції."}, {"q": "Що краще описує «типового» учня, якщо є викиди?", "o": ["Середнє", "Медіана", "Максимум", "Сума"], "a": 1, "w": "Медіана стійка до викидів."}], "mins": 45, "id": "functions", "terms": [{"t": "Функція", "d": "Готова формула з назвою: SUM, AVERAGE, IF…", "n": 4}, {"t": "Аргумент", "d": "Значення в дужках функції; в українських налаштуваннях аргументи розділяються ;", "n": 4}, {"t": "Медіана", "d": "Середнє значення в упорядкованому ряді; не боїться «викидів».", "n": 4}]}, {"n": 5, "block": "sheets", "title": "Логіка: IF, COUNTIF і умовне форматування", "sub": "Таблиця вчиться приймати рішення: «якщо…, то…», рахувати за умовою й сама фарбувати клітинки.", "goals": ["писати умови через IF", "рахувати й сумувати за умовою (COUNTIF, SUMIF, AVERAGEIF)", "поєднувати умови через AND / OR", "налаштовувати умовне форматування"], "sections": [{"t": "h", "v": "IF: якщо…, то…, інакше…"}, {"t": "code", "lang": "sheets", "v": "=IF(умова; \"якщо так\"; \"якщо ні\")\n\n=IF(E2>=8; \"висипається 😴\"; \"мало сну ⚠️\")\n=IF(F2>=10; \"відмінно\"; IF(F2>=7; \"добре\"; \"треба підтягнути\"))", "run": false, "title": null, "note": "Другий приклад — <b>вкладений IF<\/b>: другий IF стоїть на місці «якщо ні». Так можна перевірити кілька варіантів по черзі."}, {"t": "sheet", "rows": [["Ім'я", "Сон, год", "Висновок"], ["Аня", "8", "висипається 😴"], ["Богдан", "7", "мало сну ⚠️"], ["Віка", "9", "висипається 😴"], ["Денис", "6", "мало сну ⚠️"], ["Олена", "8", "висипається 😴"]], "f": "=IF(B2>=8; \"висипається 😴\"; \"мало сну ⚠️\")", "sel": "C2", "hl": {"C2": "g", "C3": "r", "C5": "r"}, "cap": "Одна формула, протягнута вниз, дає висновок для кожного учня.", "name": "Аркуш1"}, {"t": "table", "head": ["Оператор", "Значення"], "rows": [["=", "дорівнює"], ["&lt;&gt;", "не дорівнює"], ["&gt; &lt;", "більше / менше"], ["&gt;= &lt;=", "більше або дорівнює / менше або дорівнює"]]}, {"t": "h", "v": "AND та OR"}, {"t": "code", "lang": "sheets", "v": "=IF(AND(E2>=8; D2<=5); \"здоровий режим 💪\"; \"\")     обидві умови\n=IF(OR(C2=\"Інформатика\"; C2=\"Математика\"); \"технар\"; \"\")   хоча б одна", "run": false, "title": null, "note": null}, {"t": "h", "v": "Рахуємо за умовою"}, {"t": "code", "lang": "sheets", "v": "=COUNTIF(C2:C30; \"Інформатика\")        скільки обрали інформатику\n=COUNTIF(D2:D30; \">5\")                 скільки грають більше 5 год\n=SUMIF(B2:B30; \"8-А\"; D2:D30)          сума годин ігор у 8-А\n=AVERAGEIF(B2:B30; \"8-Б\"; E2:E30)      середній сон у 8-Б\n=COUNTIFS(B2:B30; \"8-А\"; E2:E30; \">=8\") 8-А і сон від 8 год", "run": false, "title": null, "note": null}, {"t": "tip", "v": "COUNTIF з умовою-текстом пишемо в лапках: <code>\">5\"<\/code>, <code>\"8-А\"<\/code>. Умову можна взяти з клітинки: <code>=COUNTIF(C2:C30; H2)<\/code> — тоді змінюєш H2, і результат змінюється."}, {"t": "h", "v": "Умовне форматування: таблиця фарбує сама"}, {"t": "steps", "v": ["Виділи діапазон (наприклад, E2:E30 — сон).", "<b>Формат → Умовне форматування<\/b>.", "Правило: «Менше ніж» 7 → червоний фон. <b>Готово<\/b>.", "Додай ще правило: «Більше або дорівнює» 8 → зелений.", "Для оцінок спробуй вкладку <b>Колірна шкала<\/b>: від червоного (мало) до зеленого (багато)."]}, {"t": "sheet", "rows": [["Ім'я", "Клас", "Предмет", "Ігри, год/тижд", "Сон, год", "Математика"], ["Аня", "8-А", "Біологія", "3", "8", "10"], ["Богдан", "8-А", "Інформатика", "10", "7", "9"], ["Віка", "8-Б", "Малювання", "2", "9", "11"], ["Денис", "8-Б", "Фізкультура", "12", "6", "7"], ["Олена", "8-А", "Інформатика", "5", "8", "12"]], "f": null, "sel": "E5", "hl": {"E2": "g", "E3": "y", "E4": "g", "E5": "r", "E6": "g", "F5": "r", "F6": "g", "F4": "g"}, "cap": "Умовне форматування: проблемні значення видно одразу, навіть у таблиці на 500 рядків.", "name": "Аркуш1"}], "project": "Додай до «Учнів» стовпець «Режим» з IF (сон ≥ 8 і ігри ≤ 7 год → «💪 баланс», інакше «⚠️»). На новому аркуші «Підсумки» порахуй COUNTIF: скільки учнів обрали кожен предмет. Налаштуй умовне форматування для сну.", "check": ["Зміни години сну в даних — «Режим» і кольори змінились самі", "Сума COUNTIF за всіма предметами = кількість учнів", "Формат → Умовне форматування: видно всі твої правила справа"], "hw": [{"lvl": "Базовий", "v": "Журнал оцінок: стовпець «Статус» — «атестований», якщо середнє ≥ 4, інакше «н/а». Червоним — оцінки нижче 4."}, {"lvl": "Середній", "v": "Таблиця футбольного турніру класу: очки (перемога 3, нічия 1) через вкладені IF."}, {"lvl": "Зірочка ⭐", "v": "Умовне форматування за власною формулою: підсвіти ВЕСЬ рядок учня, якщо сон &lt; 7 (правило «Ваша формула»: =$E2&lt;7)."}], "quiz": [{"q": "Що поверне =IF(5>3; \"так\"; \"ні\")?", "o": ["ні", "так", "TRUE", "5"], "a": 1, "w": "5 > 3 — правда."}, {"q": "Яка функція порахує, скільки разів зустрічається «Інформатика»?", "o": ["SUM", "COUNTIF", "IF", "AVERAGE"], "a": 1, "w": "COUNTIF = порахувати за умовою."}, {"q": "Що робить AND(A1>5; B1>5)?", "o": ["Правда, якщо хоча б одна умова виконана", "Правда, лише якщо виконані обидві", "Додає A1 і B1", "Нічого"], "a": 1, "w": "AND = і."}], "mins": 45, "id": "logic", "terms": [{"t": "Умова", "d": "Вираз, що буває правдою або неправдою: E2>=8.", "n": 5}, {"t": "IF", "d": "Функція «якщо…, то…, інакше…».", "n": 5}, {"t": "COUNTIF / SUMIF", "d": "Порахувати / підсумувати лише ті клітинки, що відповідають умові.", "n": 5}, {"t": "Умовне форматування", "d": "Автоматичне розфарбування клітинок за правилом.", "n": 5}]}, {"n": 6, "block": "sheets", "title": "Сортування, фільтри й перевірка даних", "sub": "Наводимо лад у великих таблицях: сортуємо, фільтруємо, закріплюємо заголовки й захищаємось від помилок введення.", "goals": ["сортувати дані за одним і кількома стовпцями", "фільтрувати таблицю й створювати подання фільтра", "робити випадні списки (перевірка даних)", "закріплювати рядки й знаходити дублікати"], "sections": [{"t": "h", "v": "Сортування"}, {"t": "steps", "v": ["Клацни будь-де в таблиці → <b>Дані → Сортувати діапазон → Розширені параметри<\/b>.", "Постав галочку <b>«Дані мають рядок заголовка»<\/b> (інакше заголовки «поїдуть» униз!).", "Обери стовпець і напрям: А→Я (зростання) або Я→А (спадання).", "<b>Додати інший стовпець сортування<\/b>: наприклад, спершу за класом, усередині класу — за оцінкою."]}, {"t": "warn", "v": "Ніколи не сортуй <b>один<\/b> виділений стовпець окремо від інших: імена перемішаються з чужими оцінками. Сортуй весь діапазон."}, {"t": "h", "v": "Фільтр"}, {"t": "p", "v": "<b>Дані → Створити фільтр<\/b>. У заголовках з'являться іконки ⏷: можна залишити лише 8-А, лише тих, хто спить менше 7 годин, або знайти учнів за текстом. Рядки не видаляються, а просто ховаються."}, {"t": "sheet", "rows": [["Ім'я", "Клас", "Предмет", "Ігри, год/тижд", "Сон, год", "Математика"], ["Аня", "8-А", "Біологія", "3", "8", "10"], ["Богдан", "8-А", "Інформатика", "10", "7", "9"], ["Олена", "8-А", "Інформатика", "5", "8", "12"]], "f": null, "sel": "B1", "hl": {"B1": "b"}, "cap": "Фільтр за стовпцем «Клас» = 8-А. Номери рядків пропускаються: інші рядки сховані, але не видалені.", "name": "Аркуш1"}, {"t": "tip", "v": "<b>Подання фільтра<\/b> (Дані → Подання фільтрів) — особистий фільтр: ти бачиш відфільтровано, а однокласники в тій самій таблиці — як було. Незамінно при спільній роботі."}, {"t": "h", "v": "Перевірка даних: випадні списки"}, {"t": "steps", "v": ["Виділи стовпець «Клас» (B2:B100).", "<b>Дані → Перевірка даних → Додати правило<\/b>.", "Критерії: <b>Випадний список<\/b> → варіанти 8-А, 8-Б, 9-А.", "Розширені параметри: <b>Відхиляти введення<\/b>, якщо значення не зі списку.", "Для годин сну: критерій <b>«Число між»<\/b> 0 і 24."]}, {"t": "idea", "v": "Перевірка даних — це «охоронець» таблиці. Без неї хтось напише «8а», хтось «8 А», хтось «восьмий» — і COUNTIF порахує їх як три різні класи."}, {"t": "h", "v": "Ще корисне"}, {"t": "table", "head": ["Що", "Де"], "rows": [["Закріпити заголовки, щоб не зникали при прокрутці", "Вигляд → Закріпити → 1 рядок"], ["Видалити дублікати", "Дані → Очищення даних → Видалити дублікати"], ["Прибрати зайві пробіли", "Дані → Очищення даних → Видалити пробіли"], ["Розбити «Прізвище Ім'я» на два стовпці", "Дані → Розділити текст на стовпці"], ["Знайти й замінити", "<kbd>Ctrl<\/kbd>+<kbd>H<\/kbd>"]]}], "project": "Додай випадні списки для «Клас» і «Предмет», обмеж години сну числом 0–24. Закріпи рядок заголовків, увімкни фільтр і зроби подання фільтра «Мало сну» (сон &lt; 7).", "check": ["Спробуй ввести «8а» — таблиця має відхилити", "Подання «Мало сну» видно в Дані → Подання фільтрів", "При прокрутці вниз заголовки залишаються на місці"], "hw": [{"lvl": "Базовий", "v": "Список 20 улюблених фільмів/ігор класу: відсортуй за роком, потім за назвою."}, {"lvl": "Середній", "v": "Таблиця чергувань: випадний список днів і імен, перевірка, щоб не було двох чергових в один день."}, {"lvl": "Зірочка ⭐", "v": "Дізнайся про функції SORT і FILTER (=FILTER(A2:F30; E2:E30&lt;7)) — вони сортують і фільтрують формулою на окремому аркуші."}, {"lvl": "Підготовка", "v": "Наступного уроку — <b>Контрольна №1: Основи таблиць<\/b>. Повтори уроки 1–6."}], "quiz": [{"q": "Що станеться, якщо відсортувати лише один стовпець з імен?", "o": ["Нічого", "Імена перемішаються з чужими даними", "Таблиця видалиться", "Відсортуються всі стовпці"], "a": 1, "w": "Сортуй увесь діапазон."}, {"q": "Що робить фільтр зі «зайвими» рядками?", "o": ["Видаляє", "Ховає", "Фарбує", "Переносить на інший аркуш"], "a": 1, "w": "Рядки ховаються, а не видаляються."}, {"q": "Навіщо перевірка даних?", "o": ["Для краси", "Щоб у клітинки вводили лише правильні значення", "Для швидкості", "Щоб сортувати"], "a": 1, "w": "Охоронець таблиці."}], "mins": 45, "id": "filters", "terms": [{"t": "Сортування", "d": "Впорядкування рядків за значенням стовпця (А→Я, 1→9 або навпаки).", "n": 6}, {"t": "Фільтр", "d": "Тимчасове приховування рядків, що не відповідають умові.", "n": 6}, {"t": "Перевірка даних", "d": "Правило, яке дозволяє вводити в клітинку лише певні значення (наприклад, випадний список).", "n": 6}]}, {"n": 7, "block": "sheets2", "title": "Пошук: VLOOKUP і XLOOKUP", "sub": "Знаходимо дані в іншій таблиці чи на іншому аркуші й розбираємося з помилками у формулах.", "goals": ["знаходити дані через XLOOKUP і VLOOKUP", "брати дані з інших аркушів", "обробляти помилки через IFERROR", "розпізнавати #N/A, #DIV/0!, #VALUE!, #REF!"], "sections": [{"t": "h", "v": "Пошук у таблиці"}, {"t": "p", "v": "Уяви: на одному аркуші список учнів, на іншому — оцінки за контрольну, але в іншому порядку. Переписувати вручну — довго й з помилками. Для цього є пошук:"}, {"t": "sheet", "rows": [["Ім'я", "Бал", "", "Шукаю:", "Віка"], ["Аня", "10", "", "Бал:", "11"], ["Богдан", "9", "", "", ""], ["Віка", "11", "", "", ""], ["Денис", "7", "", "", ""]], "f": "=XLOOKUP(E1; A2:A5; B2:B5)", "sel": "E2", "hl": {"A4": "y", "B4": "g", "E1": "b", "E2": "g"}, "cap": "XLOOKUP(що шукаю; де шукаю; що повернути): знайшов «Віка» в A2:A5 і повернув сусіднє значення з B.", "name": "Аркуш1"}, {"t": "code", "lang": "sheets", "v": "=XLOOKUP(E1; A2:A30; B2:B30; \"не знайдено\")    сучасний і простий\n=VLOOKUP(E1; A2:F30; 2; FALSE)                  класичний: 2 = другий стовпець діапазону,\n                                                FALSE = точний збіг\n=XLOOKUP(A2; 'Контрольна'!A:A; 'Контрольна'!B:B)  з іншого аркуша", "run": false, "title": null, "note": null}, {"t": "tip", "v": "У VLOOKUP завжди пиши <b>FALSE<\/b> (точний збіг) в кінці. Без нього функція шукає «приблизно» і може повернути чужу оцінку."}, {"t": "h", "v": "INDEX + MATCH: пошук «у будь-який бік»"}, {"t": "code", "lang": "sheets", "v": "=MATCH(\"Віка\"; A2:A30; 0)            на якому місці «Віка» у списку → 3\n=INDEX(B2:B30; 3)                    третє значення зі стовпця B\n=INDEX(B2:B30; MATCH(\"Віка\"; A2:A30; 0))   разом = пошук", "run": false, "title": null, "note": null}, {"t": "h", "v": "Помилки під контролем"}, {"t": "code", "lang": "sheets", "v": "=IFERROR(XLOOKUP(E1; A2:A30; B2:B30); \"немає такого учня\")\n=IFERROR(D2/C2; 0)", "run": false, "title": null, "note": null}, {"t": "h", "v": "Помилки у формулах"}, {"t": "table", "head": ["Помилка", "Що означає", "Що робити"], "rows": [["<code>#N/A<\/code>", "Пошук нічого не знайшов", "Перевір написання (зайвий пробіл?), або додай «не знайдено» в XLOOKUP"], ["<code>#DIV/0!<\/code>", "Ділення на нуль", "Порожній діапазон? Обгорни: =IFERROR(A1/B1; 0)"], ["<code>#VALUE!<\/code>", "Неправильний тип даних", "Текст замість числа"], ["<code>#REF!<\/code>", "Посилання на видалену клітинку", "Перепиши формулу"], ["<code>#NAME?<\/code>", "Невідома функція", "Друкарська помилка в назві"]]}], "project": "Створи аркуш «Контрольна» з іменами (в іншому порядку) і балами. На аркуші «Учні» додай стовпець «Бал за контрольну» через XLOOKUP з повідомленням, якщо учня не знайдено.", "check": ["Перемішай рядки «Контрольної» — бали на «Учнях» не змінились", "Навмисно зроби помилку в імені — побачиш «не знайдено»", "Наведи мишку на помилку — Sheets пояснить, що не так"], "hw": [{"lvl": "Базовий", "v": "«Словник»: аркуш з англійськими словами й перекладами і клітинка-пошук перекладу."}, {"lvl": "Середній", "v": "«Магазин»: аркуш «Товари» і аркуш «Замовлення». Ціна підтягується XLOOKUP, сума рахується."}, {"lvl": "Зірочка ⭐", "v": "Пошук за двома умовами (ім'я + клас) через XLOOKUP з &: =XLOOKUP(H1&H2; A2:A30&B2:B30; F2:F30)."}], "quiz": [{"q": "Що робить XLOOKUP(\"Віка\"; A2:A5; B2:B5)?", "o": ["Рахує", "Знаходить «Віка» в A і повертає значення з того ж рядка в B", "Сортує", "Видаляє"], "a": 1, "w": "Пошук і повернення."}, {"q": "Що означає #N/A?", "o": ["Ділення на нуль", "Пошук нічого не знайшов", "Невідома функція", "Все гаразд"], "a": 1, "w": "Not Available."}, {"q": "Навіщо IFERROR?", "o": ["Знайти помилку", "Показати своє значення замість помилки", "Видалити формулу", "Округлити"], "a": 1, "w": "Замість #N/A — зрозумілий текст."}], "mins": 45, "id": "lookup", "terms": [{"t": "XLOOKUP / VLOOKUP", "d": "Функції пошуку: знаходять значення в одному стовпці й повертають відповідне з іншого.", "n": 7}, {"t": "#N/A", "d": "Помилка «не знайдено» у функціях пошуку.", "n": 7}, {"t": "IFERROR", "d": "Показує своє значення замість помилки формули.", "n": 7}]}, {"n": 8, "block": "sheets2", "title": "Текст і дати", "sub": "Склеюємо, розрізаємо й чистимо текст, рахуємо дні до канікул і вік.", "goals": ["склеювати текст через & і TEXTJOIN", "використовувати UPPER, PROPER, LEFT, LEN, TRIM, SPLIT, SUBSTITUTE", "рахувати з датами", "форматувати дату й число в тексті (TEXT)"], "sections": [{"t": "h", "v": "Текст"}, {"t": "code", "lang": "sheets", "v": "=A2 & \" з \" & B2                  «Аня з 8-А» — склеїти текст\n=UPPER(A2)  =LOWER(A2)            ВЕЛИКІ / маленькі літери\n=LEN(A2)                          довжина тексту\n=LEFT(A2; 1)                      перша літера (ініціал)\n=TRIM(A2)                         прибрати зайві пробіли\n=SPLIT(\"Шевченко Тарас\"; \" \")     розбити на дві клітинки", "run": false, "title": null, "note": null}, {"t": "code", "lang": "sheets", "v": "=PROPER(\"тарас шевченко\")          «Тарас Шевченко» — кожне слово з великої\n=SUBSTITUTE(A2; \"8а\"; \"8-А\")       замінити текст\n=TEXTJOIN(\", \"; TRUE; A2:A6)       «Аня, Богдан, Віка, Денис, Олена»\n=REGEXMATCH(C2; \"інфо\")            чи містить текст «інфо» → TRUE/FALSE", "run": false, "title": null, "note": null}, {"t": "tip", "v": "Брудні дані — найчастіша проблема: «8а», «8 А», « 8-А». Комбінація <code>=UPPER(TRIM(B2))<\/code> + SUBSTITUTE рятує COUNTIF і зведені таблиці."}, {"t": "h", "v": "Дати"}, {"t": "code", "lang": "sheets", "v": "=TODAY()                           сьогоднішня дата\n=DATE(2026; 12; 31) - TODAY()      скільки днів до Нового року\n=DATEDIF(B2; TODAY(); \"Y\")         скільки повних років (вік)\n=WEEKDAY(B2; 2)                    день тижня (1 = понеділок)\n=TEXT(B2; \"dddd\")                  назва дня тижня", "run": false, "title": null, "note": null}, {"t": "p", "v": "Дата в таблиці — це насправді <b>число днів<\/b> від 30.12.1899. Тому дати можна віднімати (отримаєш кількість днів) і додавати до них числа (дата + 7 = через тиждень)."}, {"t": "code", "lang": "sheets", "v": "=TEXT(TODAY(); \"dd.mm.yyyy\")         дата як текст\n=\"До канікул \" & (DATE(2026;12;24) - TODAY()) & \" днів\"\n=WORKDAY(TODAY(); 10)                дата через 10 робочих днів\n=NETWORKDAYS(TODAY(); DATE(2026;12;24))   скільки робочих (навчальних) днів", "run": false, "title": null, "note": null}], "project": "Додай до «Учнів» стовпець «Дата народження» і рахуй «Вік» через DATEDIF. Стовпець «Підпис»: «Аня (8-А) — Біологія». Почисть стовпець «Клас» формулою від зайвих пробілів і різних написань.", "check": ["Вік правильний (перевір свій)", "Після чистки COUNTIF за класами дає правильні числа", "Дата народження праворуч — це справжня дата, а не текст"], "hw": [{"lvl": "Базовий", "v": "Таблиця «Дні народження класу»: скільки днів до кожного й хто наступний (SORT або MIN)."}, {"lvl": "Середній", "v": "Генератор логінів: з «Шевченко Тарас» → «T.Shevchenko»? Хоча б «Т.Шевченко» (SPLIT, LEFT, &)."}, {"lvl": "Зірочка ⭐", "v": "Таймер до кінця навчального року в днях, тижнях і робочих днях на одному аркуші."}], "quiz": [{"q": "Що поверне =LEN(\"Київ\")?", "o": ["1", "4", "5", "Київ"], "a": 1, "w": "4 символи."}, {"q": "Що отримаємо, якщо відняти дві дати?", "o": ["Помилку", "Кількість днів між ними", "Текст", "Рік"], "a": 1, "w": "Дата = число днів."}, {"q": "Яка функція прибирає зайві пробіли?", "o": ["CLEAN", "TRIM", "SPLIT", "LEN"], "a": 1, "w": "TRIM."}], "mins": 45, "id": "text-dates", "terms": [{"t": "Конкатенація", "d": "Склеювання тексту оператором & або функцією TEXTJOIN.", "n": 8}, {"t": "TODAY", "d": "Функція, що повертає сьогоднішню дату й оновлюється щодня.", "n": 8}]}, {"n": 9, "block": "sheets2", "title": "Діаграми", "sub": "З чисел — у картинку. Обираємо правильний тип діаграми й робимо так, щоб вона розповідала історію.", "goals": ["обирати тип діаграми під питання", "будувати й налаштовувати діаграми", "робити назви-висновки й підписи осей", "помічати «брехливі» діаграми"], "sections": [{"t": "h", "v": "Яку діаграму обрати"}, {"t": "table", "head": ["Питання", "Діаграма", "Приклад"], "rows": [["Порівняти категорії", "📊 Стовпчаста", "Скільки учнів обрали кожен предмет"], ["Зміна з часом", "📈 Лінійна", "Оцінки по місяцях"], ["Частини цілого (до 5 частин)", "🥧 Кругова", "Частка 8-А і 8-Б"], ["Зв'язок двох чисел", "⚬ Точкова", "Години ігор ↔ оцінка з математики"]]}, {"t": "h", "v": "Будуємо діаграму"}, {"t": "steps", "v": ["Виділи дані разом із заголовками (наприклад, «Предмет» і «Кількість» з аркуша «Підсумки»).", "<b>Вставлення → Діаграма<\/b>. Sheets сам запропонує тип.", "Справа — <b>Редактор діаграм<\/b>: вкладка «Налаштування» — тип і дані, «Налаштувати» — назва, кольори, підписи осей.", "Обов'язково: зрозуміла <b>назва<\/b> й підписи осей з одиницями (год, бали).", "⋮ на діаграмі → <b>Завантажити<\/b> як PNG, щоб вставити в презентацію."]}, {"t": "tip", "v": "Хороша діаграма відповідає на одне питання. Назва — це відповідь: не «Діаграма 1», а «Інформатика — найпопулярніший предмет у 8-х класах»."}, {"t": "h", "v": "Як діаграми обманюють"}, {"t": "cards", "v": [{"i": "✂️", "h": "Обрізана вісь", "p": "Вісь Y починається не з 0: різниця 7,4 і 7,8 виглядає як «удвічі»."}, {"i": "🥧", "h": "Забагато шматків", "p": "Кругова з 12 частинами — нічого не зрозуміло. Більше 5 — бери стовпчасту."}, {"i": "🌈", "h": "Зайві кольори й 3D", "p": "Об'ємні діаграми спотворюють пропорції. Простота = чесність."}]}, {"t": "tip", "v": "Подвійна перевірка діаграми: (1) прочитай лише назву й підписи — чи зрозуміло, про що це? (2) прикрий назву — чи видно висновок з картинки?"}], "project": "Аркуш «Графіки»: стовпчаста — популярність предметів, кругова — частка класів, точкова — ігри ↔ сон. Під кожною — висновок одним реченням.", "check": ["Кожна діаграма має назву-висновок і підписи осей з одиницями", "Зміни дані — діаграми оновились", "Вісь Y стовпчастої починається з 0"], "hw": [{"lvl": "Базовий", "v": "Діаграма своїх оцінок з 5 предметів і лінійна — температура за тиждень."}, {"lvl": "Середній", "v": "Знайди 2 «брехливі» діаграми в новинах/рекламі й поясни, що з ними не так."}, {"lvl": "Зірочка ⭐", "v": "SPARKLINE: міні-графік прямо в клітинці для кожного учня."}], "quiz": [{"q": "Яка діаграма для зміни оцінок по місяцях?", "o": ["Кругова", "Лінійна", "Точкова", "Таблиця"], "a": 1, "w": "Час — лінія."}, {"q": "Коли НЕ варто брати кругову діаграму?", "o": ["2 частини", "Більше 5 частин", "Частки класу", "Завжди можна"], "a": 1, "w": "Забагато шматків."}, {"q": "Яка вісь «обманює»?", "o": ["Що починається з 0", "Що починається не з 0 і збільшує різницю", "Горизонтальна", "Будь-яка"], "a": 1, "w": "Обрізана вісь."}], "mins": 45, "id": "charts", "terms": [{"t": "Діаграма", "d": "Візуальне подання даних: стовпчаста, лінійна, кругова, точкова.", "n": 9}]}, {"n": 10, "block": "sheets2", "title": "Зведені таблиці й аналіз", "sub": "Сотні рядків → кілька підсумків за секунди. Групуємо, рахуємо й робимо висновки.", "goals": ["створювати зведені таблиці", "групувати за кількома ознаками", "додавати фільтри й зрізи", "формулювати висновки з даних"], "sections": [{"t": "h", "v": "Зведена таблиця (pivot table)"}, {"t": "p", "v": "Є 300 рядків опитування. Потрібно: середній сон <b>для кожного класу<\/b> і кількість учнів. Можна писати AVERAGEIF для кожного класу… а можна за 30 секунд зробити зведену таблицю."}, {"t": "steps", "v": ["Клацни в таблиці → <b>Вставлення → Зведена таблиця<\/b> → «Новий аркуш».", "<b>Рядки<\/b> → додай «Клас».", "<b>Значення<\/b> → додай «Сон» і обери «AVERAGE». Ще раз «Ім'я» → «COUNTA».", "Хочеш розрізати ще й за предметом? <b>Стовпці<\/b> → «Предмет»."]}, {"t": "sheet", "rows": [["Клас", "AVERAGE сон", "COUNTA ім'я"], ["8-А", "7,7", "3"], ["8-Б", "7,5", "2"], ["Загальний підсумок", "7,6", "5"]], "f": null, "sel": null, "hl": {}, "cap": "Зведена таблиця: підсумки за групами без жодної формули. Змінились дані — таблиця оновилась.", "name": "Зведена таблиця 1"}, {"t": "idea", "v": "Зведена таблиця в Sheets = <code>groupby<\/code> у pandas = <code>GROUP BY<\/code> в SQL. Ти щойно вивчив ідею, яку використовують аналітики в усьому світі. Ми ще зустрінемо її в Python!"}, {"t": "h", "v": "Зрізи (slicers)"}, {"t": "p", "v": "<b>Дані → Додати зріз<\/b> — кнопка-фільтр поверх аркуша. Обираєш «8-А», і зведена таблиця та діаграми одразу показують лише 8-А. Ідеально для дашбордів."}, {"t": "h", "v": "Від чисел до висновків"}, {"t": "list", "v": ["Що найбільше / найменше?", "Чи є різниця між групами (8-А vs 8-Б)?", "Чи є зв'язок (більше ігор → менше сну)?", "Чи є дивні значення (сон 20 годин — помилка введення?)", "<b>Обережно:<\/b> зв'язок не означає причину. Якщо ті, хто більше грає, мають нижчі оцінки, це ще не доводить, що ігри — причина."]}], "project": "Зведена таблиця: для кожного класу — кількість учнів, середній сон, середні ігри. Друга: популярність предметів у кожному класі (Рядки — Предмет, Стовпці — Клас). Додай зріз за класом.", "check": ["Сума кількостей у зведеній = кількість рядків у даних", "Додай нового учня — зведена оновилась", "Зріз змінює зведену таблицю"], "hw": [{"lvl": "Базовий", "v": "Зведена таблиця витрат за категоріями з таблиці «Бюджет»."}, {"lvl": "Середній", "v": "Дані про 30+ фільмів (жанр, рік, оцінка): середня оцінка за жанрами і роками."}, {"lvl": "Зірочка ⭐", "v": "Обчислюване поле у зведеній таблиці (Значення → Обчислюване поле): наприклад, «ігри на день» = ігри / 7."}, {"lvl": "Підготовка", "v": "Наступного уроку — <b>Контрольна №2: Пошук, текст і аналіз<\/b>. Повтори уроки 7–10."}], "quiz": [{"q": "Що робить зведена таблиця?", "o": ["Видаляє дані", "Підсумовує дані за групами", "Малює", "Сортує"], "a": 1, "w": "Групування."}, {"q": "Що таке зріз?", "o": ["Видалення рядків", "Кнопка-фільтр для зведених таблиць і діаграм", "Діаграма", "Аркуш"], "a": 1, "w": "Slicer."}, {"q": "Кореляція доводить причину?", "o": ["Так", "Ні", "Так, якщо даних багато", "Іноді"], "a": 1, "w": "Зв'язок ≠ причина."}], "mins": 45, "id": "pivot", "terms": [{"t": "Зведена таблиця", "d": "Інструмент, що підсумовує дані за групами без формул (pivot table).", "n": 10}, {"t": "Зріз (slicer)", "d": "Кнопка-фільтр для зведених таблиць і діаграм.", "n": 10}, {"t": "Кореляція", "d": "Міра зв'язку між двома величинами; зв'язок не означає причину.", "n": 10}]}, {"n": 11, "block": "sheets3", "title": "Google Forms: збираємо дані", "sub": "Опитування, анкети й тести, відповіді яких самі падають у таблицю.", "goals": ["створювати форму з різними типами питань", "налаштовувати перевірку відповідей і обов'язкові питання", "зв'язувати форму з таблицею", "робити тест з автоматичною оцінкою"], "sections": [{"t": "h", "v": "Google Forms: дані без хаосу"}, {"t": "steps", "v": ["<a href='https://forms.google.com' target='_blank'>forms.google.com<\/a> → <b>Порожня форма<\/b>. Назва: «Дослідження класу».", "Додай питання з правильним <b>типом<\/b>: «Ім'я» — коротка відповідь; «Клас» — випадний список; «Скільки годин спиш» — коротка відповідь з <b>перевіркою відповіді: число<\/b>; «Улюблений предмет» — один із списку.", "Зроби важливі питання <b>обов'язковими<\/b>.", "Вкладка <b>Відповіді → Зв'язати з Таблицями<\/b>: усі відповіді автоматично падатимуть у Google Sheets.", "<b>Надіслати<\/b> → посилання 🔗 → скороти й поділись з класом."]}, {"t": "idea", "v": "Форма — це та сама «перевірка даних», але зручна для людей. Кожен учень заповнює зі свого телефона, а в таблиці — акуратні рядки з часом відповіді."}, {"t": "warn", "v": "Не збирай зайвого: ні прізвищ повністю, ні адрес, ні телефонів. Для дослідження досить ім'я або псевдонім. Попередь, для чого збираєш дані й хто їх побачить."}, {"t": "h", "v": "Типи питань"}, {"t": "table", "head": ["Тип", "Коли"], "rows": [["Коротка відповідь", "Ім'я, число (з перевіркою «Число»)"], ["Абзац", "Відгук, побажання"], ["Один із списку", "Один варіант: клас, улюблений предмет"], ["Прапорці", "Кілька варіантів: хобі"], ["Шкала", "Оцінка від 1 до 10"], ["Сітка", "Оцінити кілька предметів за однією шкалою"], ["Дата / Час", "День народження, час підйому"]]}, {"t": "h", "v": "Тест з автоматичною оцінкою"}, {"t": "steps", "v": ["Налаштування форми → <b>Зробити тестом<\/b>.", "У кожному питанні → <b>Ключ відповіді<\/b>: правильний варіант і кількість балів.", "Можна додати пояснення до неправильної відповіді.", "Учні одразу бачать бал, а ти — статистику: які питання найважчі."]}, {"t": "tip", "v": "Розділи (кнопка «Додати розділ») і логіка «Перейти до розділу на основі відповіді»: різні питання для 8-А і 8-Б в одній формі."}], "project": "Створи форму «Дослідження класу» (6–8 питань, мінімум 4 різні типи, перевірка числа для годин сну), зв'яжи з таблицею, збери 10+ відповідей.", "check": ["Нова відповідь з'являється в таблиці за секунди", "Не можна ввести «багато» у поле годин — лише число", "Відповіді: вкладка «Підсумок» показує готові діаграми"], "hw": [{"lvl": "Базовий", "v": "Форма «Куди поїдемо на екскурсію?» і діаграма результатів."}, {"lvl": "Середній", "v": "Тест-вікторина з 10 питань з ключем відповідей і поясненнями."}, {"lvl": "Зірочка ⭐", "v": "Форма з розгалуженням: різні питання залежно від відповіді."}], "quiz": [{"q": "Як отримати відповіді форми в таблиці?", "o": ["Переписати вручну", "Відповіді → Зв'язати з Таблицями", "Завантажити PDF", "Ніяк"], "a": 1, "w": "Зв'язок з Sheets."}, {"q": "Який тип питання для вибору кількох хобі?", "o": ["Один із списку", "Прапорці", "Коротка відповідь", "Шкала"], "a": 1, "w": "Прапорці — кілька."}, {"q": "Що зробити, щоб у форму вводили лише число?", "o": ["Попросити", "Перевірка відповіді → Число", "Зробити обов'язковим", "Нічого"], "a": 1, "w": "Перевірка відповіді."}], "mins": 45, "id": "forms", "terms": [{"t": "Google Forms", "d": "Сервіс опитувань і тестів, відповіді яких потрапляють у Google Sheets.", "n": 11}]}, {"n": 12, "block": "sheets3", "title": "Функції-суперсили: UNIQUE, FILTER, SORT, QUERY", "sub": "Одна формула — ціла таблиця результатів. Майже як мова запитів до бази даних.", "goals": ["використовувати UNIQUE, SORT, FILTER", "поєднувати функції в одній формулі", "писати запити QUERY", "будувати аркуш аналізу, що оновлюється сам"], "sections": [{"t": "h", "v": "Функції, що повертають цілі таблиці"}, {"t": "code", "lang": "sheets", "v": "=UNIQUE(C2:C100)                       список предметів без повторів\n=SORT(A2:F100; 5; FALSE)               уся таблиця, відсортована за 5-м стовпцем ↓\n=FILTER(A2:F100; E2:E100 < 7)          лише учні, що сплять менше 7 год\n=FILTER(A2:A100; B2:B100 = \"8-А\")      імена з 8-А\n=SORT(UNIQUE(C2:C100))                 можна вкладати одна в одну!", "run": false, "title": null, "note": "Ці функції пишуть у <b>одну<\/b> клітинку, а результат «розливається» на скільки потрібно рядків і стовпців. Дані у формі оновились — результат теж."}, {"t": "h", "v": "QUERY: SQL усередині таблиці"}, {"t": "code", "lang": "sheets", "v": "=QUERY(A1:F100; \"select C, count(A) group by C order by count(A) desc\")\n     → кожен предмет і скільки учнів його обрали, найпопулярніші зверху\n\n=QUERY(A1:F100; \"select A, E where E < 7 order by E\")\n     → імена й сон тих, хто спить менше 7 год\n\n=QUERY(A1:F100; \"select B, avg(E), avg(D) group by B\")\n     → середній сон та ігри по класах", "run": false, "title": null, "note": "У QUERY стовпці називаються літерами (A, B, C…). Це мова запитів, дуже схожа на SQL, яку використовують справжні бази даних."}, {"t": "tip", "v": "Якщо дані з форми, у першому стовпці буде «Позначка часу». Не забудь, що тоді всі стовпці зсунуться на одну літеру."}, {"t": "h", "v": "Розбір QUERY"}, {"t": "table", "head": ["Частина", "Що робить", "Як у SQL"], "rows": [["select A, E", "які стовпці показати", "SELECT"], ["where E &lt; 7", "умова", "WHERE"], ["group by B", "групувати", "GROUP BY"], ["order by E desc", "сортувати ↓", "ORDER BY"], ["limit 5", "лише перші 5", "LIMIT"], ["label avg(E) 'Сон'", "назва стовпця результату", "AS"]]}, {"t": "tip", "v": "Пиши QUERY поступово: спочатку <code>select *<\/code>, перевір, потім додавай where, потім group by. Так легко знайти, на якому кроці помилка."}], "project": "Аркуш «Аналіз»: UNIQUE предметів, FILTER «мало сну», SORT за іграми, три QUERY (кількість за предметами, середні по класах, топ-5 за оцінкою). Усе має працювати з даними з форми.", "check": ["Нова відповідь у формі → «Аналіз» оновився", "QUERY без помилки #VALUE! (перевір літери стовпців)", "Жодного числа, введеного вручну"], "hw": [{"lvl": "Базовий", "v": "FILTER: список учнів, у яких улюблений предмет — інформатика."}, {"lvl": "Середній", "v": "QUERY: середня оцінка за предметами, лише предмети з 3+ учнями (підказка: having не працює — використай вкладений QUERY або FILTER)."}, {"lvl": "Зірочка ⭐", "v": "IMPORTRANGE: підтягни дані з таблиці однокласника й об'єднай два класи в одному аналізі."}], "quiz": [{"q": "Що поверне =UNIQUE(C2:C100)?", "o": ["Кількість", "Список без повторів", "Перше значення", "Суму"], "a": 1, "w": "Унікальні значення."}, {"q": "Яка частина QUERY відповідає за умову?", "o": ["select", "where", "order by", "label"], "a": 1, "w": "where = де."}, {"q": "На яку мову схожий QUERY?", "o": ["Python", "SQL", "HTML", "CSS"], "a": 1, "w": "SQL."}], "mins": 45, "id": "superfunctions", "terms": [{"t": "UNIQUE / FILTER / SORT", "d": "Функції, що повертають цілі таблиці: без повторів, за умовою, впорядковані.", "n": 12}, {"t": "QUERY", "d": "Функція-запит до таблиці мовою, схожою на SQL.", "n": 12}]}, {"n": 13, "block": "sheets3", "title": "Спільна робота, автоматизація й AI", "sub": "Коментарі, захист, імпорт даних з інтернету, перший скрипт на Apps Script і AI-помічники в таблицях.", "goals": ["налаштовувати доступ, коментарі й захист діапазонів", "імпортувати дані: IMPORTRANGE, IMPORTHTML, GOOGLETRANSLATE, IMAGE", "записувати макроси й запускати простий Apps Script", "використовувати AI для формул розважливо"], "sections": [{"t": "h", "v": "Робота в команді"}, {"t": "list", "v": ["<b>Коментар<\/b>: правий клік → Коментар, <code>@ім'я<\/code> — сповістить людину й можна призначити завдання.", "<b>Захист<\/b>: Дані → Захистити аркуші й діапазони. Учні заповнюють свої рядки, але не зламають формули.", "<b>Історія версій<\/b>: Файл → Історія версій — повернути будь-який стан.", "<b>Сповіщення<\/b>: Інструменти → Правила сповіщень — лист, коли хтось змінив таблицю."]}, {"t": "h", "v": "Дані з інтернету"}, {"t": "code", "lang": "sheets", "v": "=IMPORTRANGE(\"посилання_на_іншу_таблицю\"; \"Учні!A1:F100\")   дані з іншої таблиці\n=IMPORTHTML(\"https://uk.wikipedia.org/wiki/...\"; \"table\"; 1) таблиця з вебсторінки\n=GOOGLETRANSLATE(A2; \"uk\"; \"en\")                            переклад\n=IMAGE(\"https://.../logo.png\")                              картинка в клітинці\n=GOOGLEFINANCE(\"CURRENCY:USDUAH\")                           курс долара", "run": false, "title": null, "note": null}, {"t": "h", "v": "Макроси: запис дій"}, {"t": "steps", "v": ["<b>Розширення → Макроси → Записати макрос<\/b>.", "Зроби дії: оформи заголовок, відсортуй, розфарбуй.", "<b>Зберегти<\/b>, дай назву. Тепер ці дії повторюються одним кліком або гарячою клавішею."]}, {"t": "h", "v": "Apps Script: JavaScript для таблиць"}, {"t": "p", "v": "<b>Розширення → Apps Script<\/b> відкриває редактор коду. Це JavaScript, який керує таблицею, листами й календарем Google."}, {"t": "code", "lang": "javascript", "v": "// Своя функція: =ВІТАННЯ(\"Аня\") → «Привіт, Аня! 👋»\nfunction ВІТАННЯ(name) {\n  return 'Привіт, ' + name + '! 👋';\n}\n\n// Меню «Клас» з командою, що підсвічує тих, хто мало спить\nfunction onOpen() {\n  SpreadsheetApp.getUi().createMenu('Клас')\n    .addItem('Підсвітити мало сну', 'highlight')\n    .addToUi();\n}\nfunction highlight() {\n  const sheet = SpreadsheetApp.getActive().getSheetByName('Учні');\n  const data = sheet.getDataRange().getValues();\n  for (let i = 1; i < data.length; i++) {\n    const color = data[i][4] < 7 ? '#ffd6d6' : null;\n    sheet.getRange(i + 1, 1, 1, data[0].length).setBackground(color);\n  }\n}", "run": false, "title": "Code.gs", "note": null}, {"t": "h", "v": "AI у таблицях"}, {"t": "p", "v": "AI-асистенти добре пояснюють і пишуть формули. Промпт: «У Google Sheets стовпець B — клас, E — сон. Напиши формулу середнього сну для 8-А. Українські налаштування (розділювач ;). Поясни кожну частину.» У Google Sheets може бути вбудований помічник Gemini (залежить від акаунта й регіону)."}, {"t": "warn", "v": "Перевіряй формулу від AI на маленькому прикладі, де відповідь знаєш наперед. І не вставляй у чат з AI особисті дані однокласників."}], "project": "Захисти на аркуші «Учні» стовпці з формулами. Додай курс долара GOOGLEFINANCE на «Довідку». Запиши макрос «Оформити» і створи в Apps Script свою функцію (наприклад, =ВІТАННЯ).", "check": ["Спробуй змінити захищену клітинку з іншого акаунта", "Макрос працює з меню Розширення → Макроси", "Своя функція з Apps Script працює як звичайна"], "hw": [{"lvl": "Базовий", "v": "Таблиця-перекладач: 10 слів, GOOGLETRANSLATE на 3 мови."}, {"lvl": "Середній", "v": "IMPORTHTML: таблиця з Вікіпедії (наприклад, області України) + діаграма."}, {"lvl": "Зірочка ⭐", "v": "Apps Script: кнопка, що надсилає собі лист з підсумками класу (MailApp.sendEmail)."}, {"lvl": "Підготовка", "v": "Підготуй 3-хвилинний захист проєкту за планом з уроку 14."}], "quiz": [{"q": "Що робить IMPORTRANGE?", "o": ["Імпортує картинку", "Підтягує дані з іншої таблиці", "Перекладає", "Сортує"], "a": 1, "w": "Дані з іншої таблиці."}, {"q": "На якій мові пишуть Apps Script?", "o": ["Python", "JavaScript", "SQL", "C++"], "a": 1, "w": "JavaScript."}, {"q": "Що робити з формулою від AI?", "o": ["Одразу використовувати", "Перевірити на прикладі з відомою відповіддю", "Видалити", "Нічого"], "a": 1, "w": "Перевіряй!"}], "mins": 45, "id": "collab", "terms": [{"t": "IMPORTRANGE", "d": "Функція, що бере дані з іншої Google-таблиці.", "n": 13}, {"t": "Макрос", "d": "Записана послідовність дій, яку можна повторити одним кліком.", "n": 13}, {"t": "Apps Script", "d": "JavaScript для автоматизації Google Sheets, Forms, Gmail.", "n": 13}]}, {"n": 14, "block": "sheets3", "title": "Проєкт: дашборд «Наш клас у цифрах» і захист", "sub": "Збираємо все разом: красивий аркуш-дашборд, де весь клас видно на одному екрані.", "goals": ["спланувати дашборд під питання", "поєднати формули, діаграми й форматування", "презентувати висновки з даних"], "sections": [{"t": "h", "v": "Що таке дашборд"}, {"t": "p", "v": "<b>Дашборд<\/b> (dashboard — «приладова панель») — один екран, на якому видно головне: ключові числа, діаграми, висновки. Як панель автомобіля: не всі деталі, а лише те, що треба знати зараз."}, {"t": "sheet", "rows": [["📊 НАШ КЛАС У ЦИФРАХ", "", "", ""], ["Учнів", "Середній сон", "Ігри / тиждень", "Топ-предмет"], ["24", "7,6 год", "6,4 год", "Інформатика"], ["", "", "", ""], ["[діаграма: предмети]", "", "[діаграма: ігри ↔ сон]", ""]], "f": null, "sel": null, "hl": {"A3": "g", "B3": "g", "C3": "g", "D3": "g"}, "cap": "Структура дашборду: зверху великі ключові числа, нижче діаграми, внизу висновки.", "name": "Дашборд"}, {"t": "h", "v": "План"}, {"t": "steps", "v": ["<b>Питання.<\/b> Запиши 3–4 питання, на які відповідає дашборд: «Чи висипаються учні?», «Що найпопулярніше?».", "<b>Ключові числа<\/b> (KPI): COUNTA, AVERAGE, XLOOKUP/INDEX+MAX для «топ». Великий шрифт, по центру.", "<b>Діаграми<\/b>: 2–3, кожна відповідає на одне питання. Назва = висновок.", "<b>Висновки<\/b>: 3 речення простою мовою внизу.", "<b>Оформлення<\/b>: одна палітра (2–3 кольори), об'єднані клітинки для заголовка, сховані сітка й допоміжні аркуші (Вигляд → Показати → зняти «Лінії сітки»)."]}, {"t": "code", "lang": "sheets", "v": "=INDEX(UNIQUE(C2:C100); MATCH(MAX(COUNTIF(C2:C100; UNIQUE(C2:C100))); COUNTIF(C2:C100; UNIQUE(C2:C100)); 0))\n   → найпопулярніший предмет однією формулою (складно? — візьми з QUERY на аркуші «Аналіз»)\n\n=TEXT(AVERAGE(Учні!E2:E100); \"0,0\") & \" год\"    → «7,6 год» для красивого показу", "run": false, "title": "Корисні формули для дашборду", "note": null}, {"t": "h", "v": "Чекліст дашборду"}, {"t": "list", "v": ["☐ Видно без прокрутки на екрані ноутбука", "☐ 3–4 ключових числа великим шрифтом", "☐ 2–3 діаграми з назвами-висновками", "☐ Висновки текстом", "☐ Нічого не введено вручну — усе формулами (нові відповіді → новий дашборд)", "☐ Доступ: «Читач» для класу, «Редактор» лише в тебе"]}, {"t": "idea", "v": "Хочеш більше? Те саме можна робити кодом у курсі <b>«Python»<\/b>: коли рядків 100 000 або звіт треба повторювати щотижня, Python перемагає."}], "project": "Зроби аркуш «Дашборд» за планом. Покажи класу на 2 хвилини: питання → числа → діаграми → висновки.", "check": ["Додай нову відповідь у форму — дашборд оновився сам", "Відкрий таблицю з телефона: що видно, що ні?", "Попроси однокласника знайти головний висновок за 10 секунд"], "hw": [{"lvl": "Обов'язково", "v": "Доведи дашборд до кінця за чеклистом."}, {"lvl": "Середній", "v": "Зроби другий дашборд «Мій тиждень» (сон, навчання, спорт, екранний час) за даними, які збереш за 7 днів."}, {"lvl": "Зірочка ⭐", "v": "Вбудуй дашборд у сайт: Файл → Поділитися → Опублікувати в Інтернеті → Вбудувати (iframe)."}], "quiz": [{"q": "Що таке дашборд?", "o": ["Таблиця з усіма даними", "Один екран з головними числами, діаграмами й висновками", "Форма", "Формула"], "a": 1, "w": "Приладова панель."}, {"q": "Чому числа на дашборді краще рахувати формулами, а не вписувати?", "o": ["Так красивіше", "Щоб вони оновлювались самі, коли змінюються дані", "Так вимагає Google", "Немає різниці"], "a": 1, "w": "Автоматичне оновлення."}, {"q": "Хороша назва діаграми — це…", "o": ["«Діаграма 1»", "Висновок: «Інформатика — найпопулярніший предмет»", "Назва аркуша", "Дата"], "a": 1, "w": "Назва = відповідь на питання."}], "mins": 90, "id": "dashboard", "terms": [{"t": "Дашборд", "d": "Один екран з ключовими числами, діаграмами й висновками.", "n": 14}]}], "tests": [{"n": 1, "after": 6, "block": "sheets", "mins": 20, "q": [{"q": "Що таке B7?", "o": ["Сьомий аркуш", "Клітинка в стовпці B, рядку 7", "Формула", "Діапазон"], "a": 1, "w": "Літера — стовпець, число — рядок."}, {"q": "Що містить діапазон A2:A10?", "o": ["2 клітинки", "9 клітинок стовпця A", "10 рядків", "Весь аркуш"], "a": 1, "w": "З 2 по 10 включно — 9."}, {"q": "Формула =A1*$B$1 протягнута на рядок нижче. Що вийде?", "o": ["=A2*$B$2", "=A2*$B$1", "=A1*$B$1", "=B2*$B$1"], "a": 1, "w": "$B$1 закріплене."}, {"q": "Що поверне =AVERAGE(4; 8; 6)?", "o": ["18", "6", "8", "4"], "a": 1, "w": "(4+8+6)/3."}, {"q": "Яка функція порахує непорожні клітинки з іменами?", "o": ["COUNT", "COUNTA", "SUM", "LEN"], "a": 1, "w": "COUNT рахує лише числа."}, {"q": "Що поверне =IF(7>=8; \"ок\"; \"мало\")?", "o": ["ок", "мало", "TRUE", "Помилка"], "a": 1, "w": "7 ≥ 8 — неправда."}, {"q": "=COUNTIF(C2:C30; \"Біологія\") рахує…", "o": ["Суму", "Скільки клітинок дорівнюють «Біологія»", "Середнє", "Перше входження"], "a": 1, "w": "Підрахунок за умовою."}, {"q": "Як захиститися від «8а», «8 А», «8-А» в одному стовпці?", "o": ["Сортування", "Перевірка даних зі списком", "Діаграма", "Жирний шрифт"], "a": 1, "w": "Випадний список."}, {"q": "Відсоток 25% у клітинці насправді дорівнює…", "o": ["25", "0,25", "2,5", "«25%»"], "a": 1, "w": "Формат змінює лише вигляд."}, {"q": "Що станеться, якщо відсортувати лише стовпець з іменами?", "o": ["Нічого", "Імена перемішаються з чужими даними", "Таблиця видалиться", "Все відсортується"], "a": 1, "w": "Сортуй увесь діапазон."}], "from": 1, "title": "Контрольна №1: Основи таблиць", "sub": "Уроки 1–6 · 10 питань · 20 хвилин"}, {"n": 2, "after": 10, "block": "sheets2", "mins": 20, "q": [{"q": "Що поверне XLOOKUP, якщо значення не знайдено (без 4-го аргументу)?", "o": ["0", "#N/A", "Порожньо", "TRUE"], "a": 1, "w": "Not Available."}, {"q": "Навіщо FALSE в кінці VLOOKUP?", "o": ["Вимкнути функцію", "Точний збіг", "Сортування", "Округлення"], "a": 1, "w": "Інакше — приблизний пошук."}, {"q": "Що поверне =\"8\" & \"-А\"?", "o": ["8", "8-А", "Помилка", "14"], "a": 1, "w": "Склеювання."}, {"q": "Скільки поверне =DATE(2026;12;31)-DATE(2026;12;24)?", "o": ["7", "24", "31", "Помилка"], "a": 0, "w": "Різниця дат — дні."}, {"q": "Яку діаграму обрати для зміни оцінок за семестр?", "o": ["Кругову", "Лінійну", "Точкову", "Жодну"], "a": 1, "w": "Зміна з часом."}, {"q": "Що робить зведена таблиця?", "o": ["Видаляє дублікати", "Підсумовує дані за групами", "Перекладає", "Шифрує"], "a": 1, "w": "Групування."}, {"q": "Що з цього — ознака «брехливої» діаграми?", "o": ["Назва-висновок", "Вісь Y починається не з 0", "Підписи осей", "Легенда"], "a": 1, "w": "Перебільшення різниці."}, {"q": "#DIV/0! означає…", "o": ["Пошук без результату", "Ділення на нуль", "Невідома функція", "Неправильний тип"], "a": 1, "w": "Division by zero."}, {"q": "Що робить IFERROR(A1/B1; 0)?", "o": ["Ділить і показує 0 замість помилки", "Шукає помилки", "Видаляє B1", "Округлює"], "a": 0, "w": "Своє значення замість помилки."}, {"q": "Медіана 2, 2, 3, 3, 40 дорівнює…", "o": ["10", "3", "2", "40"], "a": 1, "w": "Середній елемент упорядкованого ряду."}], "from": 7, "title": "Контрольна №2: Пошук, текст і аналіз", "sub": "Уроки 7–10 · 10 питань · 20 хвилин"}, {"n": 3, "after": 14, "block": "sheets3", "mins": 30, "q": [{"q": "З чого починається формула?", "o": ["#", "=", "$", "+"], "a": 1, "w": "Знак =."}, {"q": "Що робить $ у $A$1?", "o": ["Валюта", "Закріплює посилання", "Округлює", "Ховає"], "a": 1, "w": "Абсолютне посилання."}, {"q": "=SUMIF(B2:B30; \"8-А\"; D2:D30) рахує…", "o": ["Кількість 8-А", "Суму D для рядків, де B = 8-А", "Середнє", "Максимум"], "a": 1, "w": "Сума за умовою."}, {"q": "Що поверне =UNIQUE(A2:A100)?", "o": ["Кількість", "Список без повторів", "Перше значення", "Суму"], "a": 1, "w": "Унікальні."}, {"q": "Яка функція залишить лише рядки за умовою?", "o": ["SORT", "FILTER", "UNIQUE", "COUNT"], "a": 1, "w": "FILTER."}, {"q": "У QUERY умову пишемо після…", "o": ["select", "where", "label", "limit"], "a": 1, "w": "where."}, {"q": "Як отримати відповіді Google Forms у таблиці?", "o": ["Переписати", "Зв'язати форму з Таблицями", "Скопіювати PDF", "Ніяк"], "a": 1, "w": "Зв'язок з Sheets."}, {"q": "Що робить IMPORTRANGE?", "o": ["Перекладає", "Бере дані з іншої таблиці", "Імпортує картинку", "Сортує"], "a": 1, "w": "Дані з іншої таблиці."}, {"q": "На якій мові Apps Script?", "o": ["Python", "JavaScript", "SQL", "Java"], "a": 1, "w": "JavaScript."}, {"q": "Чому числа на дашборді рахуються формулами?", "o": ["Красивіше", "Оновлюються самі разом з даними", "Так вимагає Google", "Немає різниці"], "a": 1, "w": "Автоматичне оновлення."}, {"q": "«Учні, що більше грають, мають нижчі оцінки». Це доводить причину?", "o": ["Так", "Ні, зв'язок ≠ причина", "Так, якщо 100 учнів", "Залежить від гри"], "a": 1, "w": "Кореляція ≠ причина."}, {"q": "Що робити з формулою від AI?", "o": ["Довіряти", "Перевірити на прикладі з відомою відповіддю", "Видалити", "Опублікувати"], "a": 1, "w": "Перевіряй."}], "from": 11, "title": "Підсумкова контрольна", "sub": "Увесь курс · 12 питань · 30 хвилин"}], "pages": {"tools": {"title": "Де працювати", "sub": "Google Sheets працює в браузері: однаково в школі, вдома й на телефоні.", "sections": [{"t": "h", "v": "Що потрібно"}, {"t": "table", "head": ["Що", "Навіщо"], "rows": [["Google-акаунт (шкільний або особистий)", "Вхід у Sheets, Forms, Drive"], ["Браузер Chrome / Edge / Firefox", "Повна версія Google Sheets"], ["Застосунок Google Sheets на телефоні", "Переглядати й швидко правити"]]}, {"t": "warn", "v": "Для власного Google-акаунта потрібно мати 13 років (в Україні). Молодші учні працюють через шкільний акаунт Google Workspace for Education або акаунт, створений батьками через Family Link."}, {"t": "h", "v": "Перше налаштування"}, {"t": "steps", "v": ["Відкрий <a href='https://sheets.google.com' target='_blank'>sheets.google.com<\/a> і увійди.", "Створи таблицю → <b>Файл → Налаштування<\/b>: регіон <b>Україна<\/b>, часовий пояс Київ. Від регіону залежить: кома в числах і <code>;<\/code> між аргументами функцій.", "Створи на Google Диску папку «Курс Sheets» — складай туди всі таблиці.", "Закріпи Диск у закладках браузера."]}, {"t": "h", "v": "Школа ↔ дім"}, {"t": "p", "v": "Нічого не треба переносити: таблиці зберігаються в хмарі автоматично. Просто увійди в той самий акаунт удома. Офлайн-режим: Google Диск → Налаштування → <b>Офлайн<\/b> (працює в Chrome)."}, {"t": "h", "v": "Excel"}, {"t": "p", "v": "Усе, що вивчаємо, працює і в Microsoft Excel (назви функцій ті самі, крім QUERY, IMPORTRANGE, GOOGLETRANSLATE та інших «гуглівських»). Відкрити Excel-файл у Sheets: Файл → Відкрити → Завантажити. Зберегти як Excel: Файл → Завантажити → .xlsx."}, {"t": "h", "v": "Гарячі клавіші"}, {"t": "table", "head": ["Клавіші", "Дія"], "rows": [["<kbd>Ctrl<\/kbd>+<kbd>/<\/kbd>", "Список усіх гарячих клавіш"], ["<kbd>Ctrl<\/kbd>+<kbd>Z<\/kbd>", "Скасувати"], ["<kbd>Ctrl<\/kbd>+<kbd>Shift<\/kbd>+<kbd>V<\/kbd>", "Вставити лише значення"], ["<kbd>Ctrl<\/kbd>+<kbd>;<\/kbd>", "Сьогоднішня дата"], ["<kbd>F4<\/kbd>", "Перемкнути $ у формулі"], ["<kbd>Ctrl<\/kbd>+<kbd>Enter<\/kbd>", "Заповнити виділені клітинки однаковим значенням"]]}]}, "project": {"title": "Проєкт «Наш клас у цифрах»", "sub": "Наскрізний проєкт курсу: від першої таблиці до дашборду, що оновлюється сам.", "sections": [{"t": "p", "v": "Кожен урок додає до проєкту одну деталь. У фіналі — таблиця з даними опитування, аналізом і красивим дашбордом, який оновлюється, щойно хтось заповнить форму."}, {"t": "sheet", "rows": [["📊 НАШ КЛАС У ЦИФРАХ", "", "", ""], ["Учнів", "Середній сон", "Ігри / тиждень", "Топ-предмет"], ["24", "7,6 год", "6,4 год", "Інформатика"], ["Висипаються", "Грають > 7 год", "8-А сон", "8-Б сон"], ["42%", "33%", "7,4 год", "7,9 год"]], "f": null, "sel": null, "hl": {"A3": "g", "B3": "g", "C3": "g", "D3": "g", "A5": "y", "B5": "y", "C5": "b", "D5": "b"}, "cap": "Приклад дашборду.", "name": "Дашборд"}, {"t": "h", "v": "Аркуші фінальної таблиці"}, {"t": "table", "head": ["Аркуш", "Що там"], "rows": [["Відповіді форми", "Сирі дані з Google Forms"], ["Учні", "Очищені дані + обчислювані стовпці (IF, XLOOKUP)"], ["Аналіз", "UNIQUE, FILTER, QUERY, COUNTIF"], ["Зведена", "Зведені таблиці за класами й предметами"], ["Графіки", "3+ діаграми з висновками"], ["Дашборд", "Один екран з головним"], ["Довідка", "Опис стовпців і джерел"]]}, {"t": "h", "v": "Критерії (12 балів)"}, {"t": "table", "head": ["Критерій", "Бали"], "rows": [["Дані зібрані формою й очищені", "2"], ["Формули: IF, COUNTIF, XLOOKUP, $", "3"], ["Аналіз: зведені таблиці, QUERY / FILTER", "2"], ["Діаграми з назвами-висновками", "2"], ["Дашборд: оновлюється сам, читабельний", "2"], ["Захист і висновки", "1"]]}]}, "ref": {"title": "📗 Довідник функцій", "sub": "Найпотрібніші функції Google Sheets з поясненнями й прикладами.", "catalog": true, "searchPh": "🔍 Пошук функції… (наприклад: IF, середнє, пошук)", "sections": [{"t": "p", "v": "Усі функції пишуться після знака <code>=<\/code>. В українських налаштуваннях аргументи розділяються <code>;<\/code>, в англійських — <code>,<\/code>."}, {"t": "idea", "v": "Не пам'ятаєш точно? Почни писати назву функції в клітинці — Google Sheets покаже підказку з описом і прикладом."}, {"t": "h", "v": "Каталог функцій"}]}}, "gloss": [{"t": "Електронна таблиця", "d": "Програма (Google Sheets, Excel), де дані лежать у клітинках і можуть самі перераховуватися формулами.", "n": 1}, {"t": "Клітинка", "d": "Одна «коробочка» таблиці на перетині стовпця й рядка.", "n": 1}, {"t": "Адреса клітинки", "d": "Літера стовпця + номер рядка: B3, F10.", "n": 1}, {"t": "Діапазон", "d": "Прямокутник клітинок, записаний через двокрапку: A2:D10.", "n": 1}, {"t": "Аркуш", "d": "Окрема «сторінка» в таблиці; ярлики аркушів — унизу екрана.", "n": 1}, {"t": "Рядок формул", "d": "Поле над таблицею, що показує справжній вміст клітинки (число чи формулу).", "n": 1}, {"t": "Спільний доступ", "d": "Налаштування, хто може переглядати, коментувати чи редагувати таблицю.", "n": 1}, {"t": "Формат числа", "d": "Як показується значення: валюта, відсоток, дата. Змінює лише вигляд, а не саме значення.", "n": 2}, {"t": "Об'єднання клітинок", "d": "Злиття кількох клітинок в одну; лише для заголовків, бо ламає сортування.", "n": 2}, {"t": "Формула", "d": "Обчислення в клітинці, що починається зі знака =.", "n": 3}, {"t": "Відносне посилання", "d": "Адреса (B2), яка зсувається при копіюванні формули.", "n": 3}, {"t": "Абсолютне посилання", "d": "Адреса із $ ($B$2), яка не змінюється при копіюванні.", "n": 3}, {"t": "Автозаповнення", "d": "Протягування формули чи послідовності за маркер у куті клітинки.", "n": 3}, {"t": "Функція", "d": "Готова формула з назвою: SUM, AVERAGE, IF…", "n": 4}, {"t": "Аргумент", "d": "Значення в дужках функції; в українських налаштуваннях аргументи розділяються ;", "n": 4}, {"t": "Медіана", "d": "Середнє значення в упорядкованому ряді; не боїться «викидів».", "n": 4}, {"t": "Умова", "d": "Вираз, що буває правдою або неправдою: E2>=8.", "n": 5}, {"t": "IF", "d": "Функція «якщо…, то…, інакше…».", "n": 5}, {"t": "COUNTIF / SUMIF", "d": "Порахувати / підсумувати лише ті клітинки, що відповідають умові.", "n": 5}, {"t": "Умовне форматування", "d": "Автоматичне розфарбування клітинок за правилом.", "n": 5}, {"t": "Сортування", "d": "Впорядкування рядків за значенням стовпця (А→Я, 1→9 або навпаки).", "n": 6}, {"t": "Фільтр", "d": "Тимчасове приховування рядків, що не відповідають умові.", "n": 6}, {"t": "Перевірка даних", "d": "Правило, яке дозволяє вводити в клітинку лише певні значення (наприклад, випадний список).", "n": 6}, {"t": "XLOOKUP / VLOOKUP", "d": "Функції пошуку: знаходять значення в одному стовпці й повертають відповідне з іншого.", "n": 7}, {"t": "#N/A", "d": "Помилка «не знайдено» у функціях пошуку.", "n": 7}, {"t": "IFERROR", "d": "Показує своє значення замість помилки формули.", "n": 7}, {"t": "Конкатенація", "d": "Склеювання тексту оператором & або функцією TEXTJOIN.", "n": 8}, {"t": "TODAY", "d": "Функція, що повертає сьогоднішню дату й оновлюється щодня.", "n": 8}, {"t": "Діаграма", "d": "Візуальне подання даних: стовпчаста, лінійна, кругова, точкова.", "n": 9}, {"t": "Зведена таблиця", "d": "Інструмент, що підсумовує дані за групами без формул (pivot table).", "n": 10}, {"t": "Зріз (slicer)", "d": "Кнопка-фільтр для зведених таблиць і діаграм.", "n": 10}, {"t": "Кореляція", "d": "Міра зв'язку між двома величинами; зв'язок не означає причину.", "n": 10}, {"t": "Google Forms", "d": "Сервіс опитувань і тестів, відповіді яких потрапляють у Google Sheets.", "n": 11}, {"t": "UNIQUE / FILTER / SORT", "d": "Функції, що повертають цілі таблиці: без повторів, за умовою, впорядковані.", "n": 12}, {"t": "QUERY", "d": "Функція-запит до таблиці мовою, схожою на SQL.", "n": 12}, {"t": "IMPORTRANGE", "d": "Функція, що бере дані з іншої Google-таблиці.", "n": 13}, {"t": "Макрос", "d": "Записана послідовність дій, яку можна повторити одним кліком.", "n": 13}, {"t": "Apps Script", "d": "JavaScript для автоматизації Google Sheets, Forms, Gmail.", "n": 13}, {"t": "Дашборд", "d": "Один екран з ключовими числами, діаграмами й висновками.", "n": 14}], "edition": "student"};
+(function(){
+const B = {}; DATA.blocks.forEach(b => B[b.id] = b);
+const M = Object.assign({
+  brand: 'Веб-майстерня', logo: '</>', kicker: 'Курс веб-розробки',
+  hero: 'Від першого тегу до власного сайту з базою даних в інтернеті. HTML, CSS, JavaScript, бекенд і робота з AI. Крок за кроком, з живими прикладами.',
+  deco: '<header>\n  <h1>Полиця</h1>\n</header>\n.card {\n  display: grid;\n}\nconst items = await\n  db.from("items")\n    .select("*");\nrender(items);',
+  projectName: 'Полиця', projectIcon: '📚',
+  projectBlurb: 'Проєкт «Полиця» — особиста колекція улюблених ігор, книг чи фільмів з пошуком, оцінками й базою даних. Кожен урок додає йому одну нову деталь.',
+  checkTitle: 'Перевір у браузері', workCard: 'VS Code, браузер, GitHub: однаково в школі й удома →',
+  nav: [['tools','🛠️ Де працювати'],['browser','🔍 Як перевіряти сторінку'],['project','📚 Проєкт «Полиця»'],['tags','🏷️ Довідник тегів'],['glossary','📘 Словник термінів'],['homework','🏠 Домашні завдання']]
+}, DATA.meta || {});
+const L = DATA.lessons, T = DATA.tests, P = DATA.pages;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+document.querySelector('.topbar .brand').innerHTML = `<span class="logo">${esc(M.logo)}</span>${M.brand}`;
+
+/* ---------- progress ---------- */
+let done = {};
+try { done = JSON.parse(localStorage.getItem('vm-done') || '{}') || {}; } catch(e) {}
+function saveDone(){ try { localStorage.setItem('vm-done', JSON.stringify(done)); } catch(e) {} }
+
+/* ---------- preview runner ---------- */
+let pvId = 0; const pvMap = {};
+const CAP = "(function(){var id=__ID__;function s(t,a){try{parent.postMessage({__pv:id,t:t,m:[].map.call(a,function(x){try{return (x&&typeof x==='object')?JSON.stringify(x,null,1):String(x)}catch(e){return String(x)}}).join(' ')},'*')}catch(e){}}['log','info','warn','error','table'].forEach(function(k){var o=console[k];console[k]=function(){s(k,arguments);try{o&&o.apply(console,arguments)}catch(e){}}});window.alert=function(m){s('alert',[m])};window.prompt=function(m){s('alert',['prompt не працює в пісочниці: '+m]);return null};window.confirm=function(m){s('alert',['confirm: '+m]);return true};window.addEventListener('error',function(e){s('error',[e.message+(e.lineno?' (рядок '+e.lineno+')':'')])});document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a');if(a&&a.getAttribute('href')&&a.getAttribute('href').charAt(0)!=='#'){e.preventDefault();s('alert',['Перехід за посиланням: '+a.getAttribute('href')])}})})();";
+function buildDoc(code, id, lang){
+  const cap = '<scr'+'ipt>' + CAP.replace('__ID__', id) + '</scr'+'ipt>';
+  if (lang === 'javascript') code = '<scr'+'ipt>\n' + code + '\n</scr'+'ipt>';
+  const base = '<style>body{font-family:system-ui,sans-serif;margin:14px;color:#1d1b26}</style>';
+  if (/<html[\s>]/i.test(code)) {
+    if (/<head[^>]*>/i.test(code)) return code.replace(/<head[^>]*>/i, m => m + cap);
+    return code.replace(/<html[^>]*>/i, m => m + '<head>' + cap + '</head>');
+  }
+  return '<!DOCTYPE html><html lang="uk"><head><meta charset="UTF-8">' + cap + base + '</head><body>' + code + '</body></html>';
+}
+window.addEventListener('message', e => {
+  const d = e.data; if (!d || d.__pv === undefined) return;
+  const c = pvMap[d.__pv]; if (!c) return;
+  c.classList.add('has');
+  const row = document.createElement('div');
+  row.className = d.t === 'error' ? 'e' : d.t === 'warn' ? 'w' : d.t === 'alert' ? 'a' : '';
+  row.textContent = (d.t === 'error' ? '✖ ' : d.t === 'alert' ? '🔔 ' : '› ') + d.m;
+  c.appendChild(row); c.scrollTop = c.scrollHeight;
+});
+function runInto(frame, cons, code, lang, h){
+  const id = ++pvId; pvMap[id] = cons;
+  cons.innerHTML = '<div class="lbl">Консоль</div>'; cons.classList.remove('has');
+  frame.srcdoc = buildDoc(code, id, lang);
+  if (h) frame.style.height = h + 'px';
+}
+
+/* ---------- python runner (Pyodide у Web Worker) ---------- */
+const PYO = 'https://cdn.jsdelivr.net/pyodide/v0.29.5/full/';
+const PY_SETUP = `
+import builtins, sys, io, base64, os, warnings
+os.environ['MPLBACKEND'] = 'Agg'
+warnings.filterwarnings('ignore')
+_inp = []
+def __set_inp(s):
+    global _inp
+    _inp = s.split('\\n') if s else []
+def _input(prompt=''):
+    print(prompt, end='')
+    v = _inp.pop(0) if _inp else ''
+    print(v)
+    return v
+builtins.input = _input
+def __run(code):
+    import traceback
+    try:
+        exec(compile(code, 'main.py', 'exec'), {'__name__': '__main__'})
+    except SystemExit:
+        pass
+    except BaseException:
+        et, ev, tb = sys.exc_info()
+        sys.stderr.write(''.join(traceback.format_exception(et, ev, tb.tb_next)))
+def __figs():
+    if 'matplotlib.pyplot' not in sys.modules:
+        return ''
+    import matplotlib.pyplot as plt
+    out = []
+    for n in plt.get_fignums():
+        b = io.BytesIO(); plt.figure(n).savefig(b, format='png', dpi=90, bbox_inches='tight')
+        out.append(base64.b64encode(b.getvalue()).decode())
+    plt.close('all')
+    return '|'.join(out)
+`;
+let pyW = null, pyBusy = Promise.resolve(), pyLoaded = false;
+function pyWorker(){
+  if (pyW) return pyW;
+  const files = DATA.files || {};
+  const src = `importScripts('${PYO}pyodide.js');
+let py;
+const ready = (async () => {
+  py = await loadPyodide({ indexURL: '${PYO}' });
+  const files = ${JSON.stringify(files)};
+  for (const k in files) py.FS.writeFile(k, files[k]);
+  py.runPython(${JSON.stringify(PY_SETUP)});
+  postMessage({ t: 'ready' });
+})();
+onmessage = async (e) => {
+  const { id, code, inp } = e.data;
+  try { await ready; } catch (err) { postMessage({ id, t: 'err', m: 'Не вдалося завантажити Python: ' + err }); postMessage({ id, t: 'done' }); return; }
+  postMessage({ id, t: 'start' });
+  py.setStdout({ batched: (s) => postMessage({ id, t: 'out', m: s }) });
+  py.setStderr({ batched: (s) => postMessage({ id, t: 'err', m: s }) });
+  try {
+    await py.loadPackagesFromImports(code, { messageCallback: (m) => postMessage({ id, t: 'info', m }) });
+    py.globals.get('__set_inp')(inp || '');
+    py.globals.get('__run')(code);
+    const figs = py.globals.get('__figs')();
+    if (figs) postMessage({ id, t: 'img', m: figs });
+  } catch (err) { postMessage({ id, t: 'err', m: String(err.message || err) }); }
+  postMessage({ id, t: 'done' });
+};`;
+  pyW = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+  return pyW;
+}
+let pyId = 0;
+function pyRun(code, inp, outEl){
+  outEl.innerHTML = ''; outEl.classList.add('on');
+  const line = (cls, text) => { const d = document.createElement('div'); d.className = cls; d.textContent = text; outEl.appendChild(d); return d; };
+  const status = line('pinfo', pyLoaded ? '⏳ Виконую…' : '⏳ Завантажую Python у браузер (лише перший раз, кілька секунд)…');
+  pyBusy = pyBusy.then(() => new Promise(resolve => {
+    const w = pyWorker(), id = ++pyId; let timer = null, any = false;
+    const finish = () => { clearTimeout(timer); w.removeEventListener('message', on); resolve(); };
+    const on = (e) => {
+      const d = e.data; if (d.t === 'ready') { pyLoaded = true; return; }
+      if (d.id !== id) return;
+      if (d.t === 'start') { status.textContent = '⏳ Виконую…'; timer = setTimeout(() => { w.terminate(); pyW = null; pyLoaded = false; status.remove(); line('perr', '⏱ Програма працювала понад 15 секунд і була зупинена. Можливо, нескінченний цикл?'); finish(); }, 15000); }
+      else if (d.t === 'info') { status.textContent = '📦 ' + d.m.replace('Loading', 'Завантажую').replace('Loaded', 'Завантажено'); }
+      else if (d.t === 'out') { any = true; line('pout', d.m); }
+      else if (d.t === 'err') { any = true; line('perr', d.m); }
+      else if (d.t === 'img') { any = true; d.m.split('|').forEach(b => { const im = document.createElement('img'); im.src = 'data:image/png;base64,' + b; im.alt = 'Графік'; outEl.appendChild(im); }); }
+      else if (d.t === 'done') { status.remove(); if (!any) line('pinfo', '✓ Виконано (програма нічого не вивела)'); finish(); }
+    };
+    w.addEventListener('message', on);
+    w.postMessage({ id, code, inp });
+  }));
+}
+
+/* ---------- section renderers ---------- */
+const PL = { html:'markup', css:'css', javascript:'javascript', sql:'sql', bash:'bash', json:'json', text:'none', python:'python', sheets:'none' };
+function secHTML(s, i){
+  switch(s.t){
+    case 'h': return `<h2>${s.v}</h2>`;
+    case 'p': return `<p>${s.v}</p>`;
+    case 'tip': return `<div class="call tip"><div class="ci">💡</div><p>${s.v}</p></div>`;
+    case 'warn': return `<div class="call warn"><div class="ci">⚠️</div><p>${s.v}</p></div>`;
+    case 'idea': return `<div class="call idea"><div class="ci">✨</div><p>${s.v}</p></div>`;
+    case 'list': return `<ul class="list">${s.v.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+    case 'steps': return `<ol class="steps">${s.v.map(x=>`<li>${x}</li>`).join('')}</ol>`;
+    case 'cards': return `<div class="cards">${s.v.map(c=>`<div class="cd"><div class="i">${c.i}</div><h4>${c.h}</h4><p>${c.p}</p></div>`).join('')}</div>`;
+    case 'table': return `<div class="tbl"><table><thead><tr>${s.head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${s.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    case 'fig': return `<figure class="fig">${s.v}<figcaption>${s.cap}</figcaption></figure>`;
+    case 'code': {
+      const lang = PL[s.lang] || 'none';
+      const lbl = s.lang === 'sheets' ? 'формула' : s.lang;
+      return `<div class="code" data-i="${i}"><div class="ch"><span class="dots"><i></i><i></i><i></i></span><span class="ttl">${esc(s.title||'')}</span><span class="lang">${lbl}</span><button class="btn cp">Копіювати</button>${s.run?'<button class="btn run">▶ Запустити</button>':''}</div><pre><code class="language-${lang}">${esc(s.v)}</code></pre>${s.lang==='python'&&s.run?`${s.inp!==undefined?`<div class="pin"><label>⌨️ Що ввести (кожен рядок — одна відповідь на input):</label><textarea rows="${Math.min(4,(s.inp||'').split('\n').length)}" spellcheck="false">${esc(s.inp||'')}</textarea></div>`:''}<div class="pyout"></div>`:''}</div>${s.note?`<p class="note">${s.note}</p>`:''}`;
+    }
+    case 'try': if (s.lang === 'python') return `<div class="play py" data-i="${i}"><div class="ph">🐍 <span>${s.title}</span><button class="btn rs">↺ Скинути</button><button class="btn cp">Копіювати</button><button class="btn prun">▶ Запустити</button></div><div class="pg"><div class="pl"><textarea class="ed" spellcheck="false"></textarea><div class="pin"><label>⌨️ Що ввести для input():</label><textarea class="pinp" rows="2" spellcheck="false"></textarea></div></div><div class="pyout on"><div class="pinfo">Натисни «▶ Запустити» або Ctrl+Enter</div></div></div></div>`;
+      return `<div class="play" data-i="${i}"><div class="ph">🧪 <span>${s.title}</span><button class="btn rs">↺ Скинути</button><button class="btn cp">Копіювати</button></div><div class="pg"><textarea class="ed" spellcheck="false"></textarea><iframe sandbox="allow-scripts allow-forms" title="Результат"></iframe></div><div class="cons"></div></div>`;
+    case 'demo': return `<div class="demo"><div class="bb"><i></i><i></i><i></i><span>твій-логін.github.io/polytsia</span></div><iframe sandbox="allow-scripts allow-forms" title="Демо"></iframe></div>`;
+    case 'plan': return planTable();
+    case 'sheet': return sheetHTML(s);
+  }
+  return '';
+}
+function sheetHTML(s){
+  const n = Math.max(...s.rows.map(r => r.length)), L2 = 'ABCDEFGHIJKLMNOP';
+  const isNum = v => /^-?[\d\s]+([.,]\d+)?\s*(₴|%|год)?$/.test(String(v).trim()) && String(v).trim() !== '';
+  let h = `<figure class="sheet"><div class="sbar"><span class="sref">${s.sel||''}</span><span class="sfx">fx</span><span class="sf">${esc(s.f||'')}</span></div><div class="swrap"><table><thead><tr><th></th>${[...Array(n)].map((_,c)=>`<th class="${s.sel&&s.sel[0]===L2[c]?'son':''}">${L2[c]}</th>`).join('')}</tr></thead><tbody>`;
+  s.rows.forEach((r, ri) => {
+    h += `<tr><th class="${s.sel&&s.sel.slice(1)==String(ri+1)?'son':''}">${ri+1}</th>`;
+    for (let c = 0; c < n; c++) {
+      const v = r[c] ?? '', ref = L2[c] + (ri+1), hl = s.hl[ref];
+      h += `<td class="${ri===0?'shd ':''}${hl?'h'+hl+' ':''}${ref===s.sel?'ssel ':''}${isNum(v)?'snum':''}">${esc(v)}</td>`;
+    }
+    h += '</tr>';
+  });
+  h += `</tbody></table></div><div class="stab"><span>${esc(s.name||'Аркуш1')}</span></div>${s.cap?`<figcaption>${s.cap}</figcaption>`:''}</figure>`;
+  return h;
+}
+function mountSections(root, secs){
+  root.querySelectorAll('.code').forEach(el => {
+    const s = secs[+el.dataset.i];
+    el.querySelector('.cp').onclick = e => copy(s.v, e.target);
+    const rb = el.querySelector('.run');
+    if (rb && s.lang === 'python') { rb.onclick = () => { const inp = el.querySelector('.pin textarea'); pyRun(s.v, inp ? inp.value : (s.inp || ''), el.querySelector('.pyout')); rb.textContent = '↻ Ще раз'; }; return; }
+    if (rb) rb.onclick = () => {
+      let out = el.querySelector('.out');
+      if (!out) { out = document.createElement('div'); out.className = 'out'; out.innerHTML = '<iframe sandbox="allow-scripts allow-forms" title="Результат"></iframe><div class="cons"></div>'; el.appendChild(out); }
+      runInto(out.querySelector('iframe'), out.querySelector('.cons'), s.v, s.lang === 'javascript' ? 'javascript' : 'html', s.lang === 'javascript' ? 70 : 240);
+      rb.textContent = '↻ Ще раз';
+    };
+  });
+  root.querySelectorAll('.play.py').forEach(el => {
+    const s = secs[+el.dataset.i]; const ta = el.querySelector('.ed'), ip = el.querySelector('.pinp'), out = el.querySelector('.pyout');
+    ta.value = s.v; ip.value = s.inp || '';
+    const go = () => pyRun(ta.value, ip.value, out);
+    el.querySelector('.prun').onclick = go;
+    ta.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); go(); }
+      if (e.key === 'Tab') { e.preventDefault(); const p = ta.selectionStart; ta.value = ta.value.slice(0,p) + '    ' + ta.value.slice(ta.selectionEnd); ta.selectionStart = ta.selectionEnd = p + 4; }
+    });
+    el.querySelector('.rs').onclick = () => { ta.value = s.v; ip.value = s.inp || ''; out.innerHTML = ''; };
+    el.querySelector('.cp').onclick = e => copy(ta.value, e.target);
+  });
+  root.querySelectorAll('.play:not(.py)').forEach(el => {
+    const s = secs[+el.dataset.i]; const ta = el.querySelector('textarea'), fr = el.querySelector('iframe'), cons = el.querySelector('.cons');
+    ta.value = s.v; let t;
+    const go = () => runInto(fr, cons, ta.value, 'html');
+    ta.addEventListener('input', () => { clearTimeout(t); t = setTimeout(go, 350); });
+    ta.addEventListener('keydown', e => { if (e.key === 'Tab') { e.preventDefault(); const p = ta.selectionStart; ta.value = ta.value.slice(0,p) + '  ' + ta.value.slice(ta.selectionEnd); ta.selectionStart = ta.selectionEnd = p + 2; } });
+    el.querySelector('.rs').onclick = () => { ta.value = s.v; go(); };
+    el.querySelector('.cp').onclick = e => copy(ta.value, e.target);
+    go();
+  });
+  root.querySelectorAll('.demo').forEach(el => {
+    const s = secs.find(x => x.t === 'demo'); el.querySelector('iframe').srcdoc = s.v;
+  });
+  if (window.Prism && Prism.highlightAllUnder) { try { Prism.highlightAllUnder(root); } catch(e) {} }
+}
+async function copy(text, btn){
+  const old = btn.textContent;
+  try { await navigator.clipboard.writeText(text); btn.textContent = '✓ Скопійовано'; }
+  catch(e) { btn.textContent = 'Виділи й скопіюй вручну'; }
+  setTimeout(() => btn.textContent = old, 1600);
+}
+
+/* ---------- quiz ---------- */
+function quizHTML(qs, key){
+  return `<div class="quiz" data-q="${key}">${qs.map((q,qi)=>`<div class="qq"><h4><small>${qi+1}.</small>${q.q}</h4>${q.o.map((o,oi)=>`<label class="opt"><input type="radio" name="${key}-${qi}" value="${oi}"><span>${o}</span></label>`).join('')}<div class="why">💬 ${q.w}</div></div>`).join('')}
+  <div class="qbar"><button class="bigbtn chk">Перевірити відповіді</button><button class="bigbtn ghost rst" style="display:none">Спробувати ще раз</button></div>
+  <div class="score"><div class="big"></div><div><p class="s1"></p><p class="s2" style="opacity:.75;font-size:14px"></p></div></div></div>`;
+}
+function grade12(c, n){ return Math.max(1, Math.round(c / n * 12)); }
+function mountQuiz(root, qs){
+  const qz = root.querySelector('.quiz'); if (!qz) return;
+  const chk = qz.querySelector('.chk'), rst = qz.querySelector('.rst'), sc = qz.querySelector('.score');
+  chk.onclick = () => {
+    let c = 0, answered = 0;
+    qz.querySelectorAll('.qq').forEach((el, qi) => {
+      const sel = el.querySelector('input:checked'); el.classList.add('checked');
+      el.querySelectorAll('.opt').forEach((o, oi) => { o.classList.remove('ok','bad'); if (oi === qs[qi].a) o.classList.add('ok'); });
+      if (sel) { answered++; if (+sel.value === qs[qi].a) c++; else sel.closest('.opt').classList.add('bad'); }
+      el.querySelectorAll('input').forEach(i => i.disabled = true);
+    });
+    const g = grade12(c, qs.length);
+    sc.querySelector('.big').textContent = `${c}/${qs.length}`;
+    sc.querySelector('.s1').innerHTML = `<b>${g} ${g===1?'бал':g<5?'бали':'балів'}</b> за 12-бальною шкалою`;
+    sc.querySelector('.s2').textContent = c === qs.length ? 'Ідеально! 🏆' : c / qs.length >= .75 ? 'Чудовий результат! Переглянь пояснення до помилок.' : c / qs.length >= .5 ? 'Непогано. Повтори теми, де помилився.' : 'Варто ще раз пройти уроки цього блоку 💪';
+    if (answered < qs.length) sc.querySelector('.s2').textContent += ` (без відповіді: ${qs.length - answered})`;
+    sc.classList.add('on'); chk.style.display = 'none'; rst.style.display = '';
+  };
+  rst.onclick = () => {
+    qz.querySelectorAll('.qq').forEach(el => { el.classList.remove('checked'); el.querySelectorAll('.opt').forEach(o => o.classList.remove('ok','bad')); el.querySelectorAll('input').forEach(i => { i.disabled = false; i.checked = false; }); });
+    sc.classList.remove('on'); chk.style.display = ''; rst.style.display = 'none';
+  };
+}
+
+/* ---------- sidebar ---------- */
+function side(route){
+  const total = L.length, d = L.filter(l => done[l.n]).length;
+  let h = `<a class="brand" href="#home"><span class="logo">${esc(M.logo)}</span>${M.brand}</a>
+  <nav class="nav-links">
+    <a href="#home" class="${route==='home'?'on':''}">🏠 Головна</a>
+    ${M.nav.map(([k,lbl])=>`<a href="#${k}" class="${route===k?'on':''}">${lbl}</a>`).join('')}
+    ${P.teacher?`<a href="#teacher" class="${route==='teacher'?'on':''}">🧑‍🏫 Для вчителя</a>`:''}
+  </nav>
+  <div class="prog">Пройдено ${d} з ${total}<div class="bar"><i style="width:${d/total*100}%"></i></div></div>`;
+  DATA.blocks.forEach(b => {
+    h += `<div class="nb" style="--bc:${b.color};--bcs:${b.soft}"><div class="nb-h" style="color:${b.color}"><span style="background:${b.color}"></span>${b.name}</div>`;
+    L.filter(l => l.block === b.id).forEach(l => {
+      h += `<a class="nl ${done[l.n]?'done':''} ${route==='lesson-'+l.n?'on':''}" href="#lesson-${l.n}"><span class="num">${done[l.n]?'✓':l.n}</span>${l.title}</a>`;
+      T.filter(t => t.after === l.n).forEach(t => {
+        h += `<a class="nl test ${route==='test-'+t.n?'on':''}" href="#test-${t.n}"><span class="num">📝</span><b>${t.title}</b></a>`;
+      });
+    });
+    h += `</div>`;
+  });
+  $('#side').innerHTML = h;
+  const on = $('#side .nl.on'); if (on) { const sd = $('#side'); const r = on.offsetTop - sd.clientHeight/2; if (on.offsetTop < sd.scrollTop || on.offsetTop > sd.scrollTop + sd.clientHeight - 60) sd.scrollTop = r; }
+}
+
+/* ---------- views ---------- */
+function home(){
+  let h = `<section class="hero"><div class="deco">${esc(M.deco)}</div>
+    <div style="font:700 13px 'Golos Text';letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:14px">${M.kicker} · ${L.length} уроків${DATA.edition==='teacher'?' · видання для вчителя':''}</div>
+    <h1>${M.brand}</h1>
+    <p>${M.hero}</p>
+    <div class="tags">${DATA.blocks.map(b=>`<b style="background:${b.color}">${b.icon} ${b.name}</b>`).join('')}</div></section>
+  <div class="stats">
+    <div class="stat"><b>${L.length}</b><span>уроків з практикою</span></div>
+    <div class="stat"><b>${T.length}</b><span>контрольних</span></div>
+    <div class="stat"><b>${DATA.gloss.length}</b><span>термінів у словнику</span></div>
+    <div class="stat"><b>${L.reduce((s,l)=>s+l.hw.length,0)}</b><span>домашніх завдань</span></div>
+  </div>
+  <h2 style="font-size:26px;margin:0 0 6px">Що ми створимо</h2>
+  <p style="color:var(--muted);margin:0 0 4px">${M.projectBlurb} <a href="#project">Детальніше →</a></p>
+  <h2 style="font-size:26px;margin:34px 0 14px">Маршрут курсу</h2><div class="road">`;
+  DATA.blocks.forEach(b => {
+    const ls = L.filter(l => l.block === b.id), ts = T.filter(t => t.block === b.id);
+    h += `<div class="rb" style="--bc:${b.color};--bcs:${b.soft}"><h3>${b.icon} ${b.name} <small>· уроки ${ls[0].n}–${ls[ls.length-1].n} · ${b.sub}</small></h3><div class="chips">${ls.map(l=>`<a class="chip" href="#lesson-${l.n}"><i>${done[l.n]?'✓':l.n}</i>${l.title}</a>`+T.filter(t=>t.after===l.n).map(t=>`<a class="chip t" href="#test-${t.n}"><i>📝</i>${t.title}</a>`).join('')).join('')}</div></div>`;
+  });
+  h += `</div>
+  <h2 style="font-size:26px;margin:40px 0 14px">Як працювати з курсом</h2>
+  <div class="cards">
+    <div class="cd"><div class="i">📖</div><h4>Читай і запускай</h4><p>Кожен приклад коду має кнопку «▶ Запустити»: результат одразу під ним.</p></div>
+    <div class="cd"><div class="i">🧪</div><h4>Експериментуй</h4><p>У блоках «Спробуй сам» змінюй код і бач результат наживо. Зламати нічого не можна.</p></div>
+    <div class="cd"><div class="i">🏗️</div><h4>Будуй проєкт</h4><p>Наприкінці кожного уроку — крок проєкту «${M.projectName}» і чекліст «${M.checkTitle}».</p></div>
+    <div class="cd"><div class="i">✅</div><h4>Перевіряй себе</h4><p>3 питання після уроку, ${T.length} контрольних з оцінкою за 12-бальною шкалою.</p></div>
+  </div>
+  <div class="cards" style="margin-top:20px">
+    <a class="cd" href="#tools" style="text-decoration:none;background:var(--ink);color:#fff;border:0"><div class="i">🛠️</div><h4>Спершу налаштуй робоче місце</h4><p style="color:#C9C5D6">${M.workCard}</p></a>
+    <a class="cd" href="#lesson-1" style="text-decoration:none;background:#F0622E;color:#fff;border:0"><div class="i">🚀</div><h4>Почати з уроку 1</h4><p style="color:#FFE3D6">${L[0].title} →</p></a>
+  </div>`;
+  $('#view').innerHTML = h;
+}
+
+function lessonView(n){
+  const l = L.find(x => x.n === n); if (!l) return home();
+  const b = B[l.block];
+  document.documentElement.style.setProperty('--c', b.color); document.documentElement.style.setProperty('--cs', b.soft);
+  const prev = L.find(x => x.n === n - 1), next = L.find(x => x.n === n + 1);
+  const test = T.find(t => t.after === n);
+  let h = `<div class="lh"><span class="crumb">${b.icon} Урок ${l.n} з ${L.length} · ${b.name}</span><h1>${l.title}</h1><p class="sub">${l.sub}</p>
+    <div class="meta"><span>⏱ ${l.mins} хв</span><span>🧩 ${l.sections.filter(s=>['code','try','sheet'].includes(s.t)).length} прикладів</span><span>🏠 ${l.hw.length} рівні ДЗ</span></div></div>
+    <div class="goals"><h4>Після уроку ти вмієш</h4><ul>${l.goals.map(g=>`<li>${g}</li>`).join('')}</ul></div>
+    ${l.terms.length?`<div class="terms"><h4>📘 Ключові поняття уроку</h4><dl>${l.terms.map(t=>`<div><dt>${t.t}</dt><dd>${t.d}</dd></div>`).join('')}</dl><a href="#glossary" class="tl">Весь словник →</a></div>`:''}
+    <div class="content">${l.sections.map(secHTML).join('')}</div>
+    <div class="box proj"><h3>🏗️ Крок проєкту «${M.projectName}»</h3><p>${l.project}</p></div>
+    <div class="box check"><h3>🔍 ${M.checkTitle}</h3><ul>${l.check.map(c=>`<li>${c}</li>`).join('')}</ul></div>
+    <div class="box hwb"><h3>🏠 Домашнє завдання</h3><div class="hw">${l.hw.map(x=>`<div class="hwi"><b>${x.lvl}</b><div>${x.v}</div></div>`).join('')}</div></div>
+    <div class="content"><h2>Самоперевірка</h2></div>${quizHTML(l.quiz, 'l'+n)}
+    ${test?`<a class="testban" href="#test-${test.n}"><span class="e">📝</span><div><b>${test.title}</b><span>${test.sub}</span></div></a>`:''}
+    <div class="donebar"><span>${done[n]?'Урок пройдено 🎉':'Пройшов урок і зробив крок проєкту?'}</span><button class="bigbtn done-btn ${done[n]?'is':''}">${done[n]?'✓ Пройдено':'Позначити як пройдений'}</button></div>
+    <div class="pn">${prev?`<a href="#lesson-${prev.n}"><small>← Урок ${prev.n}</small><b>${prev.title}</b></a>`:'<span></span>'}${next?`<a class="nx" href="#lesson-${next.n}"><small>Урок ${next.n} →</small><b>${next.title}</b></a>`:''}</div>`;
+  $('#view').innerHTML = h;
+  mountSections($('#view'), l.sections);
+  mountQuiz($('#view'), l.quiz);
+  $('.done-btn').onclick = () => { done[n] = !done[n]; if (!done[n]) delete done[n]; saveDone(); route(true); };
+}
+
+function testView(n){
+  const t = T.find(x => x.n === n); if (!t) return home();
+  const b = B[t.block];
+  document.documentElement.style.setProperty('--c', b.color); document.documentElement.style.setProperty('--cs', b.soft);
+  const nxt = L.find(l => l.n === t.after + 1);
+  $('#view').innerHTML = `<div class="lh"><span class="crumb">📝 Контроль знань · ${b.name}</span><h1>${t.title}</h1><p class="sub">${t.sub}</p></div>
+    <div class="call tip" style="margin-top:24px"><div class="ci">📋</div><p>Відповідай самостійно, без підглядання в уроки й AI. Після перевірки побачиш правильні відповіді, пояснення та бал за 12-бальною шкалою. Зроби скріншот результату для вчителя.</p></div>
+    ${quizHTML(t.q, 't'+n)}
+    <div class="pn">${`<a href="#lesson-${t.after}"><small>← Повернутися</small><b>Урок ${t.after}</b></a>`}${nxt?`<a class="nx" href="#lesson-${nxt.n}"><small>Далі →</small><b>Урок ${nxt.n}: ${nxt.title}</b></a>`:`<a class="nx" href="#home"><small>Курс завершено 🎓</small><b>На головну</b></a>`}</div>`;
+  mountQuiz($('#view'), t.q);
+}
+
+function pageView(id){
+  const p = P[id]; if (!p) return home();
+  document.documentElement.style.setProperty('--c', '#F0622E'); document.documentElement.style.setProperty('--cs', '#FFE3D6');
+  $('#view').innerHTML = `<div class="lh"><h1 style="margin-top:0">${p.title}</h1><p class="sub">${p.sub}</p></div><div class="content">${p.sections.map(secHTML).join('')}</div>${p.catalog?'<div id="tcat"></div>':''}`;
+  mountSections($('#view'), p.sections);
+  if (p.catalog) tagCatalog($('#tcat'));
+}
+
+const KIND = { fx: ['Google Sheets', '#0F9D58'], py: ['Python', '#3776AB'], block: ['Блочний', '#2F6FEB'], inline: ['Рядковий', '#F0622E'], hidden: ['Невидимий', '#6B6878'], 'void-block': ['Одиночний · блочний', '#2F6FEB'], 'void-inline': ['Одиночний · рядковий', '#F0622E'] };
+function tagCatalog(root){
+  const G = DATA.tags;
+  root.innerHTML = `<input class="gsearch" id="ts" placeholder="${(P[(location.hash||'').slice(1)]||{}).searchPh || '🔍 Пошук тегу… (наприклад: img, посилання, таблиця)'}">
+    <div class="gfilt">${G.map(g=>`<button data-g="${g.id}" style="--bc:#1D1B26;--bcs:#E7E1D6">${g.name}</button>`).join('')}</div><div id="tl"></div>`;
+  let fg = null;
+  const draw = () => {
+    const q = $('#ts').value.trim().toLowerCase();
+    let h = '';
+    G.forEach(g => {
+      if (fg && fg !== g.id) return;
+      const items = g.items.filter(t => !q || (t.tag + ' ' + t.name + ' ' + t.why).toLowerCase().includes(q));
+      if (!items.length) return;
+      h += `<h2 class="gh">${g.name}</h2><p class="tdesc">${g.desc}</p><div class="tcards">${items.map((t,i)=>{
+        const k = KIND[t.kind]; const runnable = t.kind !== 'hidden' && t.kind !== 'fx'; const plang = t.kind === 'py' ? 'python' : t.kind === 'fx' ? 'none' : 'markup';
+        return `<div class="tc" data-g="${g.id}" data-i="${g.items.indexOf(t)}"><div class="tch"><code class="tn">${esc(t.tag)}</code><span class="tk" style="color:${k[1]};border-color:${k[1]}">${k[0]}</span><a class="tl2" href="#lesson-${t.n}">урок ${t.n}</a></div>
+          <b class="tnm">${t.name}</b><p>${t.why}</p>
+          <div class="code"><div class="ch"><span class="ttl"></span><button class="btn cp">Копіювати</button>${runnable?'<button class="btn run">▶ Показати</button>':''}</div><pre><code class="language-${plang}">${esc(t.ex)}</code></pre>${t.kind==='py'?'<div class="pyout"></div>':''}</div></div>`;
+      }).join('')}</div>`;
+    });
+    $('#tl').innerHTML = h || '<p>Нічого не знайдено 🤷</p>';
+    $('#tl').querySelectorAll('.tc').forEach(el => {
+      const t = G.find(g => g.id === el.dataset.g).items[+el.dataset.i];
+      const c = el.querySelector('.code');
+      c.querySelector('.cp').onclick = e => copy(t.ex, e.target);
+      const rb = c.querySelector('.run');
+      if (rb && t.kind === 'py') rb.onclick = () => pyRun(t.ex, '', c.querySelector('.pyout'));
+      else if (rb) rb.onclick = () => {
+        let out = c.querySelector('.out');
+        if (!out) { out = document.createElement('div'); out.className = 'out'; out.innerHTML = '<iframe sandbox="allow-scripts allow-forms allow-modals" title="Результат"></iframe><div class="cons"></div>'; c.appendChild(out); }
+        runInto(out.querySelector('iframe'), out.querySelector('.cons'), t.ex, 'html', 150);
+      };
+    });
+    if (window.Prism && Prism.highlightAllUnder) { try { Prism.highlightAllUnder($('#tl')); } catch(e) {} }
+  };
+  $('#ts').addEventListener('input', draw);
+  root.querySelectorAll('.gfilt button').forEach(btn => btn.onclick = () => {
+    fg = fg === btn.dataset.g ? null : btn.dataset.g;
+    root.querySelectorAll('.gfilt button').forEach(x => x.classList.toggle('on', x.dataset.g === fg)); draw();
+  });
+  draw();
+}
+function setC(c, cs){ document.documentElement.style.setProperty('--c', c); document.documentElement.style.setProperty('--cs', cs); }
+function glossaryView(){
+  setC('#F0622E', '#FFE3D6');
+  const bl = n => B[L.find(l => l.n === n).block];
+  $('#view').innerHTML = `<div class="lh"><h1 style="margin-top:0">📘 Словник термінів</h1><p class="sub">${DATA.gloss.length} понять курсу простими словами. Біля кожного — урок, де воно з'являється вперше.</p></div>
+    <input class="gsearch" id="gs" placeholder="🔍 Пошук терміна… (наприклад: масив, API, padding)">
+    <div class="gfilt">${DATA.blocks.map(b=>`<button data-b="${b.id}" style="--bc:${b.color};--bcs:${b.soft}">${b.icon} ${b.name}</button>`).join('')}</div>
+    <div id="gl"></div>`;
+  let fb = null;
+  const draw = () => {
+    const q = $('#gs').value.trim().toLowerCase();
+    const list = DATA.gloss.filter(g => (!q || (g.t + ' ' + g.d).toLowerCase().includes(q)) && (!fb || bl(g.n).id === fb));
+    $('#gl').innerHTML = DATA.blocks.map(b => {
+      const items = list.filter(g => bl(g.n).id === b.id); if (!items.length) return '';
+      return `<h2 class="gh" style="color:${b.color}">${b.icon} ${b.name}</h2><div class="gterms">${items.map(g=>`<div class="gt" style="--bc:${b.color};--bcs:${b.soft}"><div class="gtop"><b>${g.t}</b><a href="#lesson-${g.n}">урок ${g.n}</a></div><p>${g.d}</p></div>`).join('')}</div>`;
+    }).join('') || '<p>Нічого не знайдено 🤷</p>';
+  };
+  $('#gs').addEventListener('input', draw);
+  document.querySelectorAll('.gfilt button').forEach(btn => btn.onclick = () => {
+    fb = fb === btn.dataset.b ? null : btn.dataset.b;
+    document.querySelectorAll('.gfilt button').forEach(x => x.classList.toggle('on', x.dataset.b === fb)); draw();
+  });
+  draw();
+}
+function homeworkView(){
+  setC('#F0622E', '#FFE3D6');
+  let h = `<div class="lh"><h1 style="margin-top:0">🏠 Домашні завдання</h1><p class="sub">Усі домашні завдання курсу в одному місці. «Базовий» рівень — обов'язковий для всіх, «Середній» і «Зірочка» — для вищої оцінки.</p></div>
+  <div class="call tip" style="margin-top:22px"><div class="ci">💡</div><p>Відкрий урок, щоб повторити теорію: приклади коду там можна запускати, а в блоках «Спробуй сам» — експериментувати. Відмічай зроблені завдання галочкою — вони збережуться в цьому браузері.</p></div>`;
+  DATA.blocks.forEach(b => {
+    h += `<h2 class="gh" style="color:${b.color}">${b.icon} ${b.name}</h2>`;
+    L.filter(l => l.block === b.id).forEach(l => {
+      h += `<div class="hwl" style="--bc:${b.color};--bcs:${b.soft}"><div class="hwh"><a href="#lesson-${l.n}"><i>${l.n}</i>${l.title}</a></div>
+        <div class="hwp"><b>🏗️ Проєкт:</b> ${l.project}</div>
+        ${l.hw.map((x,k)=>{ const key = 'hw-'+l.n+'-'+k; return `<label class="hwc"><input type="checkbox" data-k="${key}" ${done[key]?'checked':''}><b>${x.lvl}</b><span>${x.v}</span></label>`; }).join('')}</div>`;
+      const t = T.find(x => x.after === l.n);
+      if (t) h += `<a class="testban" href="#test-${t.n}" style="margin:0 0 14px"><span class="e">📝</span><div><b>${t.title}</b><span>${t.sub}</span></div></a>`;
+    });
+  });
+  $('#view').innerHTML = h;
+  $('#view').querySelectorAll('.hwc input').forEach(cb => cb.onchange = () => { if (cb.checked) done[cb.dataset.k] = 1; else delete done[cb.dataset.k]; saveDone(); });
+}
+function planTable(){
+  return `<div class="tbl"><table><thead><tr><th>#</th><th>Тема</th><th>Крок проєкту</th></tr></thead><tbody>${L.map(l=>{
+    const t = T.find(x => x.after === l.n);
+    const proj = l.project.replace(/<[^>]+>/g,'').split('. ')[0].slice(0,110);
+    return `<tr><td><a href="#lesson-${l.n}" style="font-weight:800;color:${B[l.block].color};text-decoration:none">${l.n}</a></td><td><b>${l.title}</b>${l.mins>45?' <small>(90 хв)</small>':''}</td><td style="color:var(--muted);font-size:14px">${proj}${proj.length>=110?'…':''}</td></tr>${t?`<tr><td>📝</td><td colspan="2"><b>${t.title}</b> — ${t.sub}</td></tr>`:''}`;
+  }).join('')}</tbody></table></div>`;
+}
+
+/* ---------- router ---------- */
+function route(keepScroll){
+  const r = (location.hash || '#home').slice(1);
+  side(r);
+  if (r.startsWith('lesson-')) lessonView(+r.split('-')[1]);
+  else if (r.startsWith('test-')) testView(+r.split('-')[1]);
+  else if (r === 'glossary') glossaryView();
+  else if (r === 'homework') homeworkView();
+  else if (P[r]) pageView(r);
+  else { document.documentElement.style.setProperty('--c', '#F0622E'); home(); }
+  document.body.classList.remove('open');
+  if (!keepScroll) window.scrollTo(0, 0);
+  const t = r.startsWith('lesson-') ? L.find(l => 'lesson-'+l.n === r) : null;
+  document.title = t ? `Урок ${t.n}. ${t.title} — ${M.brand}` : `${M.brand} · ${L.length} уроків`;
+}
+window.addEventListener('hashchange', () => route(false));
+$('#menu').onclick = () => document.body.classList.toggle('open');
+document.addEventListener('click', e => { if (document.body.classList.contains('open') && !e.target.closest('.side') && !e.target.closest('#menu')) document.body.classList.remove('open'); });
+route(false);
+if (window.Prism && Prism.highlightAllUnder) {} else { window.addEventListener('load', () => { try { Prism.highlightAllUnder($('#view')); } catch(e) {} }); }
+})();
+</script>
+</body>
+</html>
