@@ -62,7 +62,7 @@ sp["ref"] = {"title": "📗 Довідник функцій", "sub": "Найпо
   P("Усі функції пишуться після знака <code>=</code>. В українських налаштуваннях аргументи розділяються <code>;</code>, в англійських — <code>,</code>."),
   IDEA("Не пам'ятаєш точно? Почни писати назву функції в клітинці — Google Sheets покаже підказку з описом і прикладом."), H("Каталог функцій")]}
 build_course("sheets", SLS, SB, S_TESTS, S_GLOSS, sp, S_REF, "fx", {
-  "brand": "Таблиці-майстерня", "logo": "fx", "kicker": "Курс Google Sheets",
+  "brand": "Таблиці-майстерня", "logo": "fx", "favicon": '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0F9D58"/><text x="32" y="33" text-anchor="middle" dominant-baseline="central" font-family="Menlo,Consolas,monospace" font-weight="700" font-size="30" fill="#fff">fx</text></svg>', "kicker": "Курс Google Sheets",
   "hero": "Від першої клітинки до дашборду, що оновлюється сам. Формули, логіка, пошук, діаграми, зведені таблиці, Google Forms і автоматизація. Крок за кроком, з наочними прикладами.",
   "deco": "=SUM(D2:D30)\n=IF(E2>=8;\"ок\";\"⚠️\")\n=XLOOKUP(A2;Учні!A:A;Учні!F:F)\n=QUERY(A1:F;\"select B, avg(E)\n  group by B\")\n=UNIQUE(C2:C)",
   "projectName": "Наш клас у цифрах", "projectBlurb": "Наскрізний проєкт «Наш клас у цифрах»: опитування в Google Forms → таблиця з формулами → аналіз → дашборд, що оновлюється сам.",
@@ -80,7 +80,7 @@ pp = copy.deepcopy(PY_PAGES)
 pp["ref"] = {"title": "🐍 Довідник Python", "sub": "Головні команди Python з прикладами, які можна запустити прямо тут.", "catalog": True, "searchPh": "🔍 Пошук команди… (наприклад: list, цикл, pandas)", "sections": [
   P("Кожен приклад запускається кнопкою «▶ Показати» прямо в браузері. Файл <code>klas.csv</code> для прикладів з даними вже на місці."), H("Каталог команд")]}
 build_course("python", p3.PL, PB, P_TESTS, P_GLOSS, pp, P_REF, "py", {
-  "brand": "Python-майстерня", "logo": "py", "kicker": "Курс Python",
+  "brand": "Python-майстерня", "logo": "py", "favicon": '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#3776AB"/><text x="32" y="33" text-anchor="middle" dominant-baseline="central" font-family="Menlo,Consolas,monospace" font-weight="700" font-size="30" fill="#FFD43B">py</text></svg>', "kicker": "Курс Python",
   "hero": "Від першого print() до власного дослідження з даними й графіками. Змінні, умови, цикли, функції, файли, pandas і AI. Кожен приклад запускається прямо в браузері.",
   "deco": "def stars(n):\n    return '★' * n\n\nfor s in students:\n    print(s['name'])\n\ndf.groupby('class')\\\n  ['sleep'].mean()",
   "projectName": "Дослідження класу", "projectBlurb": "Три проєкти: гра-вікторина, текстова пригода і фінальне «Дослідження класу» з даними, pandas і графіками.",

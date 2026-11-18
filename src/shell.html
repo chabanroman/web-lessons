@@ -318,6 +318,7 @@ const L = DATA.lessons, T = DATA.tests, P = DATA.pages;
 const $ = s => document.querySelector(s);
 const ukn = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return n + ' ' + (m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c); };
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+(() => { const l = document.createElement('link'); l.rel = 'icon'; l.type = 'image/svg+xml'; l.href = 'data:image/svg+xml,' + encodeURIComponent(M.favicon || '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#F0622E"/><text x="32" y="33" text-anchor="middle" dominant-baseline="central" font-family="Menlo,Consolas,monospace" font-weight="700" font-size="24" fill="#fff">&lt;/&gt;</text></svg>'); document.head.appendChild(l); })();
 document.querySelector('.topbar .brand').innerHTML = `<span class="logo">${esc(M.logo)}</span>${M.brand}`;
 
 /* ---------- progress ---------- */
