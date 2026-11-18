@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Вхід для вчителя</title>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;700&family=Unbounded:wght@800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#FBF8F3;color:#1D1B26;font:400 17px/1.6 'Golos Text',system-ui,sans-serif;padding:24px}
+  main{max-width:760px;width:100%}
+  .logo{width:52px;height:52px;border-radius:16px;background:#1D1B26;color:#fff;display:grid;place-items:center;font-size:24px;margin-bottom:18px}
+  h1{font:800 clamp(28px,5vw,44px)/1.15 'Unbounded',sans-serif;margin:0 0 10px}
+  p.lead{color:#6B6878;margin:0 0 26px}
+  form{display:flex;flex-wrap:wrap;gap:10px;max-width:520px}
+  input[type=password]{flex:1;min-width:220px;padding:14px 16px;border-radius:14px;border:2px solid #E7E1D6;font:500 17px 'Golos Text',sans-serif;outline:none;background:#fff}
+  input[type=password]:focus{border-color:#1D1B26}
+  button{border:none;cursor:pointer;font:700 16px 'Golos Text',sans-serif;border-radius:14px;padding:14px 22px;background:#1D1B26;color:#fff}
+  button:disabled{opacity:.5;cursor:wait}
+  label.rem{display:flex;gap:8px;align-items:center;font-size:15px;color:#6B6878;width:100%}
+  .err{color:#E5484D;font-weight:600;min-height:26px;margin-top:8px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  a.card{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid #E7E1D6;border-radius:22px;padding:22px;transition:.2s}
+  a.card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(29,27,38,.1)}
+  .card b{display:block;font-size:19px;margin-bottom:4px}
+  .card span{color:#6B6878;font-size:15px}
+  .bar{display:flex;gap:16px;align-items:center;margin-top:26px;font-size:15px}
+  .bar a,.bar button.link{color:#6B6878;background:none;padding:0;font:600 15px 'Golos Text',sans-serif}
+  #courses{display:none}
+  .loading{color:#6B6878}
+</style>
+</head>
+<body>
+<main>
+  <div class="logo">🔒</div>
+  <section id="login">
+    <h1>Вхід для вчителя</h1>
+    <p class="lead">Видання курсів з календарним планом, оцінюванням і порадами для вчителя.</p>
+    <form id="f">
+      <input type="password" id="pw" placeholder="Пароль" autocomplete="current-password" required autofocus>
+      <button id="go">Увійти</button>
+      <label class="rem"><input type="checkbox" id="rem"> Запам'ятати на цьому пристрої</label>
+    </form>
+    <div class="err" id="err"></div>
+    <div class="bar"><a href="../">← До курсів для учнів</a></div>
+  </section>
+  <section id="courses">
+    <h1>Курси для вчителя</h1>
+    <p class="lead">Обери курс. У кожному є вкладка «🧑‍🏫 Для вчителя».</p>
+    <div class="grid">
+      <a class="card" href="?c=course25"><b>🌐 Веб · 25 уроків</b><span>Інтенсив: HTML, CSS, JS, дані, AI</span></a>
+      <a class="card" href="?c=course38"><b>🌐 Веб · 38 уроків</b><span>Повний курс з практикумами</span></a>
+      <a class="card" href="?c=sheets"><b>📗 Google Sheets · 14 уроків</b><span>Формули, аналіз, Forms, дашборд</span></a>
+      <a class="card" href="?c=python"><b>🐍 Python · 24 уроки</b><span>Від print() до pandas і графіків</span></a>
+    </div>
+    <div class="bar"><a href="../">← Учнівська версія</a><button class="link" id="out">Вийти</button></div>
+  </section>
+</main>
+<script>
+const KEY = 'teacher-pw';
+const COURSES = ['course25', 'course38', 'sheets', 'python'];
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const store = {
+  get() { try { return sessionStorage.getItem(KEY) || localStorage.getItem(KEY); } catch (e) { return null; } },
+  set(pw, remember) { try { sessionStorage.setItem(KEY, pw); if (remember) localStorage.setItem(KEY, pw); } catch (e) {} },
+  clear() { try { sessionStorage.removeItem(KEY); localStorage.removeItem(KEY); } catch (e) {} }
+};
+async function decrypt(course, pw) {
+  const res = await fetch(course + '.json', { cache: 'no-cache' });
+  if (!res.ok) throw new Error('nofile');
+  const box = await res.json();
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(box.salt), iterations: box.iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(box.iv) }, key, b64(box.data));
+  return new TextDecoder().decode(plain);
+}
+function openHtml(html) { document.open(); document.write(html); document.close(); }
+const params = new URLSearchParams(location.search);
+const course = params.get('c');
+const err = document.getElementById('err');
+
+async function enter(pw, remember) {
+  const target = COURSES.includes(course) ? course : null;
+  const html = await decrypt(target || 'course25', pw);   // помилка = неправильний пароль
+  store.set(pw, remember);
+  if (target) openHtml(html);
+  else { document.getElementById('login').style.display = 'none'; document.getElementById('courses').style.display = 'block'; }
+}
+
+document.getElementById('f').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('go'); btn.disabled = true; err.textContent = '';
+  try { await enter(document.getElementById('pw').value, document.getElementById('rem').checked); }
+  catch (x) { err.textContent = x.message === 'nofile' ? 'Файл курсу не знайдено.' : 'Неправильний пароль'; btn.disabled = false; }
+});
+document.getElementById('out').onclick = () => { store.clear(); location.href = './'; };
+
+const saved = store.get();
+if (saved) {
+  document.getElementById('login').innerHTML = '<p class="loading">⏳ Відкриваю…</p>';
+  enter(saved).catch(() => { store.clear(); location.reload(); });
+}
+</script>
+</body>
+</html>

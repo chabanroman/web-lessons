@@ -240,6 +240,8 @@ textarea.ed{white-space:pre;overflow:auto;border:0;resize:vertical;min-height:28
 .stab{display:flex;background:#F8F9FA;border-top:1px solid #DADCE0;padding:0 10px}
 .stab span{font-size:13px;padding:6px 14px;background:#fff;border-left:1px solid #DADCE0;border-right:1px solid #DADCE0;color:#188038;font-weight:600;border-bottom:3px solid #188038}
 .sheet figcaption{font-size:14px;color:var(--muted);padding:10px 14px;border-top:1px solid #EEE;font-family:'Golos Text',sans-serif}
+.allc{display:block;margin:10px 8px 0;font-size:13.5px;font-weight:600;color:var(--muted);text-decoration:none}
+.allc:hover{color:var(--ink)}
 .donebar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:40px;padding:18px 20px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);flex-wrap:wrap}
 .done-btn.is{background:#18A058}
 .pn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
@@ -314,6 +316,7 @@ const M = Object.assign({
 }, DATA.meta || {});
 const L = DATA.lessons, T = DATA.tests, P = DATA.pages;
 const $ = s => document.querySelector(s);
+const ukn = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return n + ' ' + (m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c); };
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 document.querySelector('.topbar .brand').innerHTML = `<span class="logo">${esc(M.logo)}</span>${M.brand}`;
 
@@ -570,6 +573,7 @@ function side(route){
     ${M.nav.map(([k,lbl])=>`<a href="#${k}" class="${route===k?'on':''}">${lbl}</a>`).join('')}
     ${P.teacher?`<a href="#teacher" class="${route==='teacher'?'on':''}">🧑‍🏫 Для вчителя</a>`:''}
   </nav>
+  ${/github\.io$/.test(location.hostname)?`<a class="allc" href="${location.pathname.includes('/teacher/')?'../teacher/':'../'}">↩ Усі курси</a>`:''}
   <div class="prog">Пройдено ${d} з ${total}<div class="bar"><i style="width:${d/total*100}%"></i></div></div>`;
   DATA.blocks.forEach(b => {
     h += `<div class="nb" style="--bc:${b.color};--bcs:${b.soft}"><div class="nb-h" style="color:${b.color}"><span style="background:${b.color}"></span>${b.name}</div>`;
@@ -588,7 +592,7 @@ function side(route){
 /* ---------- views ---------- */
 function home(){
   let h = `<section class="hero"><div class="deco">${esc(M.deco)}</div>
-    <div style="font:700 13px 'Golos Text';letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:14px">${M.kicker} · ${L.length} уроків${DATA.edition==='teacher'?' · видання для вчителя':''}</div>
+    <div style="font:700 13px 'Golos Text';letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:14px">${M.kicker} · ${ukn(L.length,'урок','уроки','уроків')}${DATA.edition==='teacher'?' · видання для вчителя':''}</div>
     <h1>${M.brand}</h1>
     <p>${M.hero}</p>
     <div class="tags">${DATA.blocks.map(b=>`<b style="background:${b.color}">${b.icon} ${b.name}</b>`).join('')}</div></section>
@@ -768,7 +772,7 @@ function route(keepScroll){
   document.body.classList.remove('open');
   if (!keepScroll) window.scrollTo(0, 0);
   const t = r.startsWith('lesson-') ? L.find(l => 'lesson-'+l.n === r) : null;
-  document.title = t ? `Урок ${t.n}. ${t.title} — ${M.brand}` : `${M.brand} · ${L.length} уроків`;
+  document.title = t ? `Урок ${t.n}. ${t.title} — ${M.brand}` : `${M.brand} · ${ukn(L.length,'урок','уроки','уроків')}`;
 }
 window.addEventListener('hashchange', () => route(false));
 $('#menu').onclick = () => document.body.classList.toggle('open');
