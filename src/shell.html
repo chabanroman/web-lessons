@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Веб-майстерня: від першого тегу до сайту з базою даних і AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF8F3; --paper:#fff; --ink:#1D1B26; --muted:#6B6878; --line:#E7E1D6; --soft:#F4EFE6;
+  --c:#F0622E; --cs:#FFE3D6;
+  --r:18px; --side:300px;
+  --code-bg:#1D1B26;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.65 'Golos Text',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,.brand{font-family:'Unbounded','Golos Text',sans-serif;letter-spacing:-.01em;line-height:1.2}
+code,kbd,pre,textarea.ed{font-family:'JetBrains Mono',ui-monospace,monospace}
+:not(pre)>code{background:var(--soft);border:1px solid var(--line);padding:1px 6px;border-radius:6px;font-size:.86em;white-space:nowrap}
+kbd{background:#fff;border:1px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:0 6px;font-size:.82em}
+
+/* layout */
+.side{position:fixed;inset:0 auto 0 0;width:var(--side);background:var(--paper);border-right:1px solid var(--line);overflow-y:auto;z-index:20;padding:22px 16px 40px;transition:transform .25s}
+.main{margin-left:var(--side);min-height:100vh}
+.wrap{max-width:860px;margin:0 auto;padding:40px 28px 100px}
+.topbar{display:none}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;text-decoration:none;padding:4px 8px 18px}
+.logo{width:38px;height:38px;border-radius:12px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:15px;font-family:'JetBrains Mono',monospace;font-weight:600}
+.nav-links a{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px}
+.nav-links a:hover{background:var(--soft)}
+.nav-links a.on{background:var(--ink);color:#fff}
+.prog{margin:14px 8px 6px;font-size:13px;color:var(--muted)}
+.bar{height:8px;background:var(--soft);border-radius:99px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#F0622E,#2F6FEB,#D99A00,#18A058,#8B5CF6);border-radius:99px;transition:width .4s}
+.nb{margin-top:18px}
+.nb-h{display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.nb-h span{width:10px;height:10px;border-radius:3px}
+.nl{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:10px;text-decoration:none;font-size:14.5px;line-height:1.3}
+.nl:hover{background:var(--soft)}
+.nl .num{flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--soft);color:var(--muted)}
+.nl.done .num{background:var(--bc);color:#fff}
+.nl.on{background:var(--bcs)}
+.nl.on .num{outline:2px solid var(--bc)}
+.nl.test .num{background:transparent;font-size:15px}
+
+/* hero */
+.hero{position:relative;background:var(--ink);color:#fff;border-radius:28px;padding:46px 40px;overflow:hidden}
+.hero h1{font-size:clamp(30px,5vw,50px);margin:0 0 14px;font-weight:800}
+.hero p{font-size:19px;opacity:.85;max-width:560px;margin:0}
+.hero .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:26px}
+.hero .tags b{padding:6px 14px;border-radius:99px;font-size:14px;font-weight:700}
+.hero .deco{position:absolute;right:-20px;top:-10px;font:600 15px/1.5 'JetBrains Mono',monospace;opacity:.13;white-space:pre;pointer-events:none}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0 34px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.stat b{display:block;font:800 28px 'Unbounded',sans-serif}
+.stat span{font-size:14px;color:var(--muted)}
+.road{display:grid;gap:14px}
+.rb{background:var(--paper);border:1px solid var(--line);border-left:6px solid var(--bc);border-radius:var(--r);padding:18px 20px}
+.rb h3{margin:0;font-size:18px;display:flex;gap:10px;align-items:center}
+.rb small{color:var(--muted);font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px 5px 6px;border-radius:99px;background:var(--bcs);text-decoration:none;font-size:14px;font-weight:500}
+.chip i{font-style:normal;width:22px;height:22px;border-radius:99px;background:var(--bc);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
+.chip.t{background:var(--ink);color:#fff}
+.chip.t i{background:#fff;color:var(--ink)}
+
+/* lesson */
+.crumb{display:inline-flex;gap:8px;align-items:center;padding:6px 14px;border-radius:99px;background:var(--cs);color:var(--c);font-weight:800;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+.lh h1{font-size:clamp(28px,4.2vw,42px);margin:16px 0 10px;font-weight:800}
+.lh .sub{font-size:19px;color:var(--muted);margin:0}
+.meta{display:flex;gap:16px;margin-top:14px;font-size:14px;color:var(--muted);flex-wrap:wrap}
+.goals{margin:28px 0 10px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:18px 22px}
+.goals h4{margin:0 0 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--c)}
+.goals ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}
+.goals li{padding-left:26px;position:relative;font-size:15.5px}
+.goals li:before{content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:6px;background:var(--c);color:#fff;font-size:11px;display:grid;place-items:center;margin-top:3px;font-weight:800}
+.content h2{font-size:24px;margin:44px 0 12px;font-weight:700;display:flex;gap:12px;align-items:center}
+.content h2:before{content:"";width:8px;height:26px;border-radius:4px;background:var(--c)}
+.content p{margin:12px 0}
+.content ul.list{padding-left:0;list-style:none}
+.content ul.list li{padding:8px 0 8px 22px;position:relative;border-bottom:1px dashed var(--line)}
+.content ul.list li:before{content:"";position:absolute;left:4px;top:18px;width:7px;height:7px;border-radius:99px;background:var(--c)}
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:16px 0}
+ol.steps li{counter-increment:s;position:relative;padding:12px 16px 12px 58px;background:var(--paper);border:1px solid var(--line);border-radius:14px;margin-bottom:8px}
+ol.steps li:before{content:counter(s);position:absolute;left:14px;top:12px;width:30px;height:30px;border-radius:10px;background:var(--c);color:#fff;font-weight:800;display:grid;place-items:center;font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0}
+.cd{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.cd .i{font-size:28px}
+.cd h4{margin:6px 0 4px;font-size:16px}
+.cd p{margin:0;font-size:15px;color:var(--muted)}
+.tbl{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:14px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th{background:var(--soft);text-align:left;font-weight:700;padding:10px 14px;white-space:nowrap}
+td{padding:10px 14px;border-top:1px solid var(--line);vertical-align:top}
+.call{display:flex;gap:14px;padding:16px 18px;border-radius:var(--r);margin:18px 0;font-size:16px}
+.call .ci{font-size:22px;line-height:1.3}
+.call p{margin:0}
+.call.tip{background:#E8F1FF;border:1px solid #C9DBFF}
+.call.warn{background:#FFF1E6;border:1px solid #FFD2B3}
+.call.idea{background:#F1ECFF;border:1px solid #DCD0FF}
+figure.fig{margin:22px 0;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+figure.fig svg{width:100%;height:auto;display:block}
+figure.fig figcaption{font-size:14px;color:var(--muted);text-align:center;margin-top:10px}
+
+/* code */
+.code{margin:18px 0;border-radius:16px;overflow:hidden;background:var(--code-bg);box-shadow:0 10px 30px rgba(29,27,38,.12)}
+.ch{display:flex;align-items:center;gap:10px;padding:9px 12px 9px 16px;background:#2A2835;color:#C9C5D6;font-size:13px}
+.ch .dots{display:flex;gap:6px}.ch .dots i{width:10px;height:10px;border-radius:99px;background:#4A4757}
+.ch .ttl{font-family:'JetBrains Mono',monospace;flex:1}
+.ch .lang{text-transform:uppercase;font-size:11px;letter-spacing:.08em;font-weight:700;color:#8F8AA0}
+.btn{border:none;cursor:pointer;font:600 13px 'Golos Text',sans-serif;border-radius:9px;padding:6px 12px;background:#3A3746;color:#fff;transition:.15s}
+.btn:hover{background:#4A4757}
+.btn.run{background:var(--c);color:#fff}
+.btn.run:hover{filter:brightness(1.1)}
+pre{margin:0;padding:16px 18px;overflow-x:auto;color:#EDEAF5;font-size:14px;line-height:1.6;tab-size:2}
+pre code{font-family:inherit}
+.note{font-size:14.5px;color:var(--muted);margin:-8px 4px 18px}
+.out{background:#fff;border-top:3px solid var(--c)}
+.out iframe{width:100%;height:240px;border:0;display:block;background:#fff}
+.cons{background:#16151C;color:#C9F7D9;font:13px/1.6 'JetBrains Mono',monospace;padding:10px 16px;max-height:200px;overflow:auto;display:none}
+.cons.has{display:block}
+.cons div{white-space:pre-wrap;border-bottom:1px solid #2A2835;padding:2px 0}
+.cons .e{color:#FF9B9B}.cons .w{color:#FFD58A}.cons .a{color:#A5C8FF}
+.cons .lbl{color:#6B6878;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+/* playground */
+.play{margin:22px 0;border:2px solid var(--c);border-radius:20px;overflow:hidden;background:var(--paper)}
+.ph{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--c);color:#fff;font-weight:700}
+.ph span{flex:1}
+.ph .btn{background:rgba(255,255,255,.22)}
+.ph .btn:hover{background:rgba(255,255,255,.35)}
+.pg{display:grid;grid-template-columns:1fr 1fr;min-height:280px}
+textarea.ed{white-space:pre;overflow:auto;border:0;resize:vertical;min-height:280px;padding:14px 16px;background:var(--code-bg);color:#EDEAF5;font-size:14px;line-height:1.6;outline:none;tab-size:2}
+.pg iframe{width:100%;height:100%;min-height:280px;border:0;background:#fff}
+
+/* boxes */
+.box{border-radius:22px;padding:22px 24px;margin:34px 0 0}
+.box h3{margin:0 0 10px;font-size:19px;display:flex;gap:10px;align-items:center}
+.box.proj{background:var(--ink);color:#fff}
+.box.proj p{margin:0;opacity:.92}
+.box.proj code{background:#2F2D3A;border-color:#3A3746;color:#fff}
+.box.check{background:var(--paper);border:2px dashed var(--c)}
+.box.check ul{margin:0;padding:0;list-style:none}
+.box.check li{padding:6px 0 6px 30px;position:relative}
+.box.check li:before{content:"🔍";position:absolute;left:0;top:5px}
+.hw{display:grid;gap:10px}
+.hwi{display:flex;gap:14px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.hwi b{flex:none;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:8px;background:var(--cs);color:var(--c);height:fit-content;white-space:nowrap}
+.box.hwb{background:var(--soft)}
+
+/* quiz */
+.quiz{display:grid;gap:14px}
+.qq{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.qq h4{margin:0 0 12px;font-size:16.5px;font-weight:700}
+.qq h4 small{color:var(--c);font-weight:800;margin-right:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:2px solid var(--line);border-radius:12px;margin:6px 0;cursor:pointer;font-size:15.5px;transition:.12s}
+.opt:hover{border-color:var(--c)}
+.opt input{margin-top:5px;accent-color:var(--c)}
+.opt.ok{border-color:#18A058;background:#E9F9EF}
+.opt.bad{border-color:#E5484D;background:#FFEDEE}
+.why{display:none;margin-top:8px;font-size:14.5px;color:var(--muted)}
+.checked .why{display:block}
+.qbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.bigbtn{border:none;cursor:pointer;font:700 16px 'Golos Text',sans-serif;border-radius:14px;padding:13px 22px;background:var(--c);color:#fff;transition:.15s}
+.bigbtn:hover{transform:translateY(-2px)}
+.bigbtn.ghost{background:var(--paper);color:var(--ink);border:2px solid var(--line)}
+.score{display:none;align-items:center;gap:18px;background:var(--ink);color:#fff;border-radius:18px;padding:18px 22px;margin-top:14px}
+.score.on{display:flex}
+.score .big{font:800 40px 'Unbounded',sans-serif;color:var(--c)}
+.score p{margin:0}
+
+.terms{margin:14px 0 10px;background:var(--cs);border-radius:var(--r);padding:18px 22px}
+.terms h4{margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--c)}
+.terms dl{margin:0;display:grid;gap:8px}
+.terms dl div{background:var(--paper);border-radius:12px;padding:10px 14px}
+.terms dt{font-weight:800;font-size:15.5px}
+.terms dd{margin:2px 0 0;font-size:15px;color:#3E3B49}
+.terms .tl{display:inline-block;margin-top:10px;font-size:14px;font-weight:700;color:var(--c);text-decoration:none}
+.gsearch{width:100%;margin-top:22px;padding:14px 18px;border-radius:14px;border:2px solid var(--line);font:500 17px 'Golos Text',sans-serif;background:var(--paper);outline:none}
+.gsearch:focus{border-color:var(--c)}
+.gfilt{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.gfilt button{border:2px solid var(--bcs);background:var(--paper);border-radius:99px;padding:6px 14px;font:600 14px 'Golos Text',sans-serif;cursor:pointer}
+.gfilt button.on{background:var(--bc);border-color:var(--bc);color:#fff}
+.gh{font-size:22px;margin:34px 0 12px}
+.gterms{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.gt{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--bc);border-radius:14px;padding:12px 14px}
+.gt .gtop{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.gt .gtop a{flex:none;font-size:12px;font-weight:700;background:var(--bcs);color:var(--bc);padding:2px 8px;border-radius:99px;text-decoration:none}
+.gt p{margin:6px 0 0;font-size:15px;color:#3E3B49;line-height:1.5}
+.hwl{background:var(--paper);border:1px solid var(--line);border-left:5px solid var(--bc);border-radius:16px;padding:14px 18px;margin-bottom:12px}
+.hwh a{display:flex;gap:10px;align-items:center;font-weight:800;text-decoration:none;font-size:16.5px}
+.hwh i{font-style:normal;width:28px;height:28px;border-radius:9px;background:var(--bc);color:#fff;display:grid;place-items:center;font-size:13px;flex:none}
+.hwp{font-size:14.5px;color:var(--muted);margin:8px 0 6px}
+.hwc{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px dashed var(--line);font-size:15px;cursor:pointer}
+.hwc input{margin-top:5px;accent-color:var(--bc);width:17px;height:17px;flex:none}
+.hwc b{flex:none;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:7px;background:var(--bcs);color:var(--bc);margin-top:2px}
+.hwc input:checked ~ span{text-decoration:line-through;opacity:.55}
+.tdesc{color:var(--muted);margin:-4px 0 14px;font-size:15.5px}
+.tcards{display:grid;gap:12px}
+.tc{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+.tch{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tc code.tn{font-size:17px;font-weight:600;background:#1D1B26;color:#FF8F6B;border:0;padding:3px 10px;white-space:nowrap}
+.tk{font-size:12px;font-weight:700;border:1.5px solid;border-radius:99px;padding:1px 9px}
+.tl2{margin-left:auto;font-size:12px;font-weight:700;background:var(--soft);padding:2px 9px;border-radius:99px;text-decoration:none;color:var(--muted)}
+.tnm{display:block;margin-top:10px;font-size:16.5px}
+.tc p{margin:4px 0 10px;font-size:15.5px;color:#3E3B49}
+.tc .code{margin:0}
+.tc pre{font-size:13.5px;padding:12px 16px}
+.tc .ch{padding:6px 10px}
+.tc .out iframe{height:150px}
+.donebar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:40px;padding:18px 20px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);flex-wrap:wrap}
+.done-btn.is{background:#18A058}
+.pn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.pn a{display:block;padding:16px 18px;border-radius:var(--r);background:var(--paper);border:1px solid var(--line);text-decoration:none}
+.pn a:hover{border-color:var(--c)}
+.pn small{color:var(--muted);display:block;font-size:13px}
+.pn b{font-size:15.5px}
+.pn .nx{text-align:right}
+.testban{display:flex;gap:16px;align-items:center;margin-top:24px;padding:20px 22px;border-radius:var(--r);background:var(--ink);color:#fff;text-decoration:none}
+.testban .e{font-size:34px}
+.testban b{display:block;font-size:17px}
+.testban span{opacity:.75;font-size:14px}
+.demo{border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:0 20px 50px rgba(29,27,38,.12);margin:18px 0;background:#fff}
+.demo .bb{display:flex;gap:6px;align-items:center;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.demo .bb i{width:11px;height:11px;border-radius:99px;background:#E7E1D6}
+.demo .bb span{margin-left:10px;background:#fff;border-radius:8px;padding:2px 12px;flex:1;max-width:340px}
+.demo iframe{width:100%;height:620px;border:0;display:block}
+
+/* prism tokens */
+.token.comment,.token.prolog,.token.doctype,.token.cdata{color:#8F8AA0;font-style:italic}
+.token.punctuation{color:#C9C5D6}
+.token.tag,.token.selector,.token.keyword,.token.important{color:#FF8F6B}
+.token.attr-name,.token.property,.token.function{color:#FFD166}
+.token.attr-value,.token.string,.token.url{color:#7EE2A8}
+.token.number,.token.boolean,.token.constant{color:#B79BFF}
+.token.operator,.token.entity{color:#7FB0FF}
+.token.class-name,.token.builtin{color:#7FB0FF}
+
+@media (max-width:980px){
+  .side{transform:translateX(-105%)}
+  body.open .side{transform:none;box-shadow:20px 0 60px rgba(0,0,0,.15)}
+  :not(pre)>code{white-space:normal;word-break:break-word}
+  .main{margin-left:0}
+  .topbar{display:flex;position:sticky;top:0;z-index:15;align-items:center;gap:12px;padding:10px 16px;background:rgba(251,248,243,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .topbar button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px 12px;font:600 15px 'Golos Text',sans-serif;cursor:pointer}
+  .topbar .brand{padding:0;font-size:16px}
+  .topbar .logo{width:30px;height:30px;font-size:12px}
+  .wrap{padding:24px 16px 80px}
+  .stats{grid-template-columns:1fr 1fr}
+  .goals ul{grid-template-columns:1fr}
+  .pg{grid-template-columns:1fr}
+  .hero{padding:32px 24px}
+  .pn{grid-template-columns:1fr}
+  .demo iframe{height:560px}
+}
+</style>
+</head>
+<body>
+<aside class="side" id="side"></aside>
+<div class="main">
+  <div class="topbar"><button id="menu">☰ Уроки</button><a class="brand" href="#home"><span class="logo">&lt;/&gt;</span>Веб-майстерня</a></div>
+  <div class="wrap" id="view"></div>
+</div>
+<script>window.Prism = window.Prism || {}; window.Prism.manual = true;</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script>
+/*__DATA__*/
+(function(){
+const B = {}; DATA.blocks.forEach(b => B[b.id] = b);
+const L = DATA.lessons, T = DATA.tests, P = DATA.pages;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ---------- progress ---------- */
+let done = {};
+try { done = JSON.parse(localStorage.getItem('vm-done') || '{}') || {}; } catch(e) {}
+function saveDone(){ try { localStorage.setItem('vm-done', JSON.stringify(done)); } catch(e) {} }
+
+/* ---------- preview runner ---------- */
+let pvId = 0; const pvMap = {};
+const CAP = "(function(){var id=__ID__;function s(t,a){try{parent.postMessage({__pv:id,t:t,m:[].map.call(a,function(x){try{return (x&&typeof x==='object')?JSON.stringify(x,null,1):String(x)}catch(e){return String(x)}}).join(' ')},'*')}catch(e){}}['log','info','warn','error','table'].forEach(function(k){var o=console[k];console[k]=function(){s(k,arguments);try{o&&o.apply(console,arguments)}catch(e){}}});window.alert=function(m){s('alert',[m])};window.prompt=function(m){s('alert',['prompt не працює в пісочниці: '+m]);return null};window.confirm=function(m){s('alert',['confirm: '+m]);return true};window.addEventListener('error',function(e){s('error',[e.message+(e.lineno?' (рядок '+e.lineno+')':'')])});document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a');if(a&&a.getAttribute('href')&&a.getAttribute('href').charAt(0)!=='#'){e.preventDefault();s('alert',['Перехід за посиланням: '+a.getAttribute('href')])}})})();";
+function buildDoc(code, id, lang){
+  const cap = '<scr'+'ipt>' + CAP.replace('__ID__', id) + '</scr'+'ipt>';
+  if (lang === 'javascript') code = '<scr'+'ipt>\n' + code + '\n</scr'+'ipt>';
+  const base = '<style>body{font-family:system-ui,sans-serif;margin:14px;color:#1d1b26}</style>';
+  if (/<html[\s>]/i.test(code)) {
+    if (/<head[^>]*>/i.test(code)) return code.replace(/<head[^>]*>/i, m => m + cap);
+    return code.replace(/<html[^>]*>/i, m => m + '<head>' + cap + '</head>');
+  }
+  return '<!DOCTYPE html><html lang="uk"><head><meta charset="UTF-8">' + cap + base + '</head><body>' + code + '</body></html>';
+}
+window.addEventListener('message', e => {
+  const d = e.data; if (!d || d.__pv === undefined) return;
+  const c = pvMap[d.__pv]; if (!c) return;
+  c.classList.add('has');
+  const row = document.createElement('div');
+  row.className = d.t === 'error' ? 'e' : d.t === 'warn' ? 'w' : d.t === 'alert' ? 'a' : '';
+  row.textContent = (d.t === 'error' ? '✖ ' : d.t === 'alert' ? '🔔 ' : '› ') + d.m;
+  c.appendChild(row); c.scrollTop = c.scrollHeight;
+});
+function runInto(frame, cons, code, lang, h){
+  const id = ++pvId; pvMap[id] = cons;
+  cons.innerHTML = '<div class="lbl">Консоль</div>'; cons.classList.remove('has');
+  frame.srcdoc = buildDoc(code, id, lang);
+  if (h) frame.style.height = h + 'px';
+}
+
+/* ---------- section renderers ---------- */
+const PL = { html:'markup', css:'css', javascript:'javascript', sql:'sql', bash:'bash', json:'json', text:'none' };
+function secHTML(s, i){
+  switch(s.t){
+    case 'h': return `<h2>${s.v}</h2>`;
+    case 'p': return `<p>${s.v}</p>`;
+    case 'tip': return `<div class="call tip"><div class="ci">💡</div><p>${s.v}</p></div>`;
+    case 'warn': return `<div class="call warn"><div class="ci">⚠️</div><p>${s.v}</p></div>`;
+    case 'idea': return `<div class="call idea"><div class="ci">✨</div><p>${s.v}</p></div>`;
+    case 'list': return `<ul class="list">${s.v.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+    case 'steps': return `<ol class="steps">${s.v.map(x=>`<li>${x}</li>`).join('')}</ol>`;
+    case 'cards': return `<div class="cards">${s.v.map(c=>`<div class="cd"><div class="i">${c.i}</div><h4>${c.h}</h4><p>${c.p}</p></div>`).join('')}</div>`;
+    case 'table': return `<div class="tbl"><table><thead><tr>${s.head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${s.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    case 'fig': return `<figure class="fig">${s.v}<figcaption>${s.cap}</figcaption></figure>`;
+    case 'code': {
+      const lang = PL[s.lang] || 'none';
+      return `<div class="code" data-i="${i}"><div class="ch"><span class="dots"><i></i><i></i><i></i></span><span class="ttl">${esc(s.title||'')}</span><span class="lang">${s.lang}</span><button class="btn cp">Копіювати</button>${s.run?'<button class="btn run">▶ Запустити</button>':''}</div><pre><code class="language-${lang}">${esc(s.v)}</code></pre></div>${s.note?`<p class="note">${s.note}</p>`:''}`;
+    }
+    case 'try': return `<div class="play" data-i="${i}"><div class="ph">🧪 <span>${s.title}</span><button class="btn rs">↺ Скинути</button><button class="btn cp">Копіювати</button></div><div class="pg"><textarea class="ed" spellcheck="false"></textarea><iframe sandbox="allow-scripts allow-forms" title="Результат"></iframe></div><div class="cons"></div></div>`;
+    case 'demo': return `<div class="demo"><div class="bb"><i></i><i></i><i></i><span>твій-логін.github.io/polytsia</span></div><iframe sandbox="allow-scripts allow-forms" title="Демо"></iframe></div>`;
+    case 'plan': return planTable();
+  }
+  return '';
+}
+function mountSections(root, secs){
+  root.querySelectorAll('.code').forEach(el => {
+    const s = secs[+el.dataset.i];
+    el.querySelector('.cp').onclick = e => copy(s.v, e.target);
+    const rb = el.querySelector('.run');
+    if (rb) rb.onclick = () => {
+      let out = el.querySelector('.out');
+      if (!out) { out = document.createElement('div'); out.className = 'out'; out.innerHTML = '<iframe sandbox="allow-scripts allow-forms" title="Результат"></iframe><div class="cons"></div>'; el.appendChild(out); }
+      runInto(out.querySelector('iframe'), out.querySelector('.cons'), s.v, s.lang === 'javascript' ? 'javascript' : 'html', s.lang === 'javascript' ? 70 : 240);
+      rb.textContent = '↻ Ще раз';
+    };
+  });
+  root.querySelectorAll('.play').forEach(el => {
+    const s = secs[+el.dataset.i]; const ta = el.querySelector('textarea'), fr = el.querySelector('iframe'), cons = el.querySelector('.cons');
+    ta.value = s.v; let t;
+    const go = () => runInto(fr, cons, ta.value, 'html');
+    ta.addEventListener('input', () => { clearTimeout(t); t = setTimeout(go, 350); });
+    ta.addEventListener('keydown', e => { if (e.key === 'Tab') { e.preventDefault(); const p = ta.selectionStart; ta.value = ta.value.slice(0,p) + '  ' + ta.value.slice(ta.selectionEnd); ta.selectionStart = ta.selectionEnd = p + 2; } });
+    el.querySelector('.rs').onclick = () => { ta.value = s.v; go(); };
+    el.querySelector('.cp').onclick = e => copy(ta.value, e.target);
+    go();
+  });
+  root.querySelectorAll('.demo').forEach(el => {
+    const s = secs.find(x => x.t === 'demo'); el.querySelector('iframe').srcdoc = s.v;
+  });
+  if (window.Prism && Prism.highlightAllUnder) { try { Prism.highlightAllUnder(root); } catch(e) {} }
+}
+async function copy(text, btn){
+  const old = btn.textContent;
+  try { await navigator.clipboard.writeText(text); btn.textContent = '✓ Скопійовано'; }
+  catch(e) { btn.textContent = 'Виділи й скопіюй вручну'; }
+  setTimeout(() => btn.textContent = old, 1600);
+}
+
+/* ---------- quiz ---------- */
+function quizHTML(qs, key){
+  return `<div class="quiz" data-q="${key}">${qs.map((q,qi)=>`<div class="qq"><h4><small>${qi+1}.</small>${q.q}</h4>${q.o.map((o,oi)=>`<label class="opt"><input type="radio" name="${key}-${qi}" value="${oi}"><span>${o}</span></label>`).join('')}<div class="why">💬 ${q.w}</div></div>`).join('')}
+  <div class="qbar"><button class="bigbtn chk">Перевірити відповіді</button><button class="bigbtn ghost rst" style="display:none">Спробувати ще раз</button></div>
+  <div class="score"><div class="big"></div><div><p class="s1"></p><p class="s2" style="opacity:.75;font-size:14px"></p></div></div></div>`;
+}
+function grade12(c, n){ return Math.max(1, Math.round(c / n * 12)); }
+function mountQuiz(root, qs){
+  const qz = root.querySelector('.quiz'); if (!qz) return;
+  const chk = qz.querySelector('.chk'), rst = qz.querySelector('.rst'), sc = qz.querySelector('.score');
+  chk.onclick = () => {
+    let c = 0, answered = 0;
+    qz.querySelectorAll('.qq').forEach((el, qi) => {
+      const sel = el.querySelector('input:checked'); el.classList.add('checked');
+      el.querySelectorAll('.opt').forEach((o, oi) => { o.classList.remove('ok','bad'); if (oi === qs[qi].a) o.classList.add('ok'); });
+      if (sel) { answered++; if (+sel.value === qs[qi].a) c++; else sel.closest('.opt').classList.add('bad'); }
+      el.querySelectorAll('input').forEach(i => i.disabled = true);
+    });
+    const g = grade12(c, qs.length);
+    sc.querySelector('.big').textContent = `${c}/${qs.length}`;
+    sc.querySelector('.s1').innerHTML = `<b>${g} ${g===1?'бал':g<5?'бали':'балів'}</b> за 12-бальною шкалою`;
+    sc.querySelector('.s2').textContent = c === qs.length ? 'Ідеально! 🏆' : c / qs.length >= .75 ? 'Чудовий результат! Переглянь пояснення до помилок.' : c / qs.length >= .5 ? 'Непогано. Повтори теми, де помилився.' : 'Варто ще раз пройти уроки цього блоку 💪';
+    if (answered < qs.length) sc.querySelector('.s2').textContent += ` (без відповіді: ${qs.length - answered})`;
+    sc.classList.add('on'); chk.style.display = 'none'; rst.style.display = '';
+  };
+  rst.onclick = () => {
+    qz.querySelectorAll('.qq').forEach(el => { el.classList.remove('checked'); el.querySelectorAll('.opt').forEach(o => o.classList.remove('ok','bad')); el.querySelectorAll('input').forEach(i => { i.disabled = false; i.checked = false; }); });
+    sc.classList.remove('on'); chk.style.display = ''; rst.style.display = 'none';
+  };
+}
+
+/* ---------- sidebar ---------- */
+function side(route){
+  const total = L.length, d = L.filter(l => done[l.n]).length;
+  let h = `<a class="brand" href="#home"><span class="logo">&lt;/&gt;</span>Веб-майстерня</a>
+  <nav class="nav-links">
+    <a href="#home" class="${route==='home'?'on':''}">🏠 Головна</a>
+    <a href="#tools" class="${route==='tools'?'on':''}">🛠️ Де працювати</a>
+    <a href="#browser" class="${route==='browser'?'on':''}">🔍 Як перевіряти сторінку</a>
+    <a href="#project" class="${route==='project'?'on':''}">📚 Проєкт «Полиця»</a>
+    <a href="#tags" class="${route==='tags'?'on':''}">🏷️ Довідник тегів</a>
+    <a href="#glossary" class="${route==='glossary'?'on':''}">📘 Словник термінів</a>
+    <a href="#homework" class="${route==='homework'?'on':''}">🏠 Домашні завдання</a>
+    ${P.teacher?`<a href="#teacher" class="${route==='teacher'?'on':''}">🧑‍🏫 Для вчителя</a>`:''}
+  </nav>
+  <div class="prog">Пройдено ${d} з ${total}<div class="bar"><i style="width:${d/total*100}%"></i></div></div>`;
+  DATA.blocks.forEach(b => {
+    h += `<div class="nb" style="--bc:${b.color};--bcs:${b.soft}"><div class="nb-h" style="color:${b.color}"><span style="background:${b.color}"></span>${b.name}</div>`;
+    L.filter(l => l.block === b.id).forEach(l => {
+      h += `<a class="nl ${done[l.n]?'done':''} ${route==='lesson-'+l.n?'on':''}" href="#lesson-${l.n}"><span class="num">${done[l.n]?'✓':l.n}</span>${l.title}</a>`;
+      T.filter(t => t.after === l.n).forEach(t => {
+        h += `<a class="nl test ${route==='test-'+t.n?'on':''}" href="#test-${t.n}"><span class="num">📝</span><b>${t.title}</b></a>`;
+      });
+    });
+    h += `</div>`;
+  });
+  $('#side').innerHTML = h;
+  const on = $('#side .nl.on'); if (on) { const sd = $('#side'); const r = on.offsetTop - sd.clientHeight/2; if (on.offsetTop < sd.scrollTop || on.offsetTop > sd.scrollTop + sd.clientHeight - 60) sd.scrollTop = r; }
+}
+
+/* ---------- views ---------- */
+function home(){
+  const deco = '<header>\n  <h1>Полиця</h1>\n</header>\n.card {\n  display: grid;\n}\nconst items = await\n  db.from("items")\n    .select("*");\nrender(items);';
+  let h = `<section class="hero"><div class="deco">${esc(deco)}</div>
+    <div style="font:700 13px 'Golos Text';letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:14px">Курс веб-розробки · ${L.length} уроків${DATA.edition==='teacher'?' · видання для вчителя':''}</div>
+    <h1>Веб-майстерня</h1>
+    <p>Від першого тегу до власного сайту з базою даних в інтернеті. HTML, CSS, JavaScript, бекенд і робота з AI. Крок за кроком, з живими прикладами.</p>
+    <div class="tags">${DATA.blocks.map(b=>`<b style="background:${b.color}">${b.icon} ${b.name}</b>`).join('')}</div></section>
+  <div class="stats">
+    <div class="stat"><b>${L.length}</b><span>уроків з практикою</span></div>
+    <div class="stat"><b>${T.length}</b><span>контрольних</span></div>
+    <div class="stat"><b>${DATA.gloss.length}</b><span>термінів у словнику</span></div>
+    <div class="stat"><b>${L.reduce((s,l)=>s+l.hw.length,0)}</b><span>домашніх завдань</span></div>
+  </div>
+  <h2 style="font-size:26px;margin:0 0 6px">Що ми створимо</h2>
+  <p style="color:var(--muted);margin:0 0 4px">Проєкт «Полиця» — особиста колекція улюблених ігор, книг чи фільмів з пошуком, оцінками й базою даних. Кожен урок додає йому одну нову деталь. <a href="#project">Подивитися демо →</a></p>
+  <h2 style="font-size:26px;margin:34px 0 14px">Маршрут курсу</h2><div class="road">`;
+  DATA.blocks.forEach(b => {
+    const ls = L.filter(l => l.block === b.id), ts = T.filter(t => t.block === b.id);
+    h += `<div class="rb" style="--bc:${b.color};--bcs:${b.soft}"><h3>${b.icon} ${b.name} <small>· уроки ${ls[0].n}–${ls[ls.length-1].n} · ${b.sub}</small></h3><div class="chips">${ls.map(l=>`<a class="chip" href="#lesson-${l.n}"><i>${done[l.n]?'✓':l.n}</i>${l.title}</a>`+T.filter(t=>t.after===l.n).map(t=>`<a class="chip t" href="#test-${t.n}"><i>📝</i>${t.title}</a>`).join('')).join('')}</div></div>`;
+  });
+  h += `</div>
+  <h2 style="font-size:26px;margin:40px 0 14px">Як працювати з курсом</h2>
+  <div class="cards">
+    <div class="cd"><div class="i">📖</div><h4>Читай і запускай</h4><p>Кожен приклад коду має кнопку «▶ Запустити»: результат одразу під ним.</p></div>
+    <div class="cd"><div class="i">🧪</div><h4>Експериментуй</h4><p>У блоках «Спробуй сам» змінюй код і бач результат наживо. Зламати нічого не можна.</p></div>
+    <div class="cd"><div class="i">🏗️</div><h4>Будуй проєкт</h4><p>Наприкінці кожного уроку — крок проєкту «Полиця» і чекліст «Перевір у браузері».</p></div>
+    <div class="cd"><div class="i">✅</div><h4>Перевіряй себе</h4><p>3 питання після уроку, ${T.length} контрольних з оцінкою за 12-бальною шкалою.</p></div>
+  </div>
+  <div class="cards" style="margin-top:20px">
+    <a class="cd" href="#tools" style="text-decoration:none;background:var(--ink);color:#fff;border:0"><div class="i">🛠️</div><h4>Спершу налаштуй робоче місце</h4><p style="color:#C9C5D6">VS Code, браузер, GitHub: однаково в школі й удома →</p></a>
+    <a class="cd" href="#lesson-1" style="text-decoration:none;background:#F0622E;color:#fff;border:0"><div class="i">🚀</div><h4>Почати з уроку 1</h4><p style="color:#FFE3D6">Як влаштований веб. Перша сторінка →</p></a>
+  </div>`;
+  $('#view').innerHTML = h;
+}
+
+function lessonView(n){
+  const l = L.find(x => x.n === n); if (!l) return home();
+  const b = B[l.block];
+  document.documentElement.style.setProperty('--c', b.color); document.documentElement.style.setProperty('--cs', b.soft);
+  const prev = L.find(x => x.n === n - 1), next = L.find(x => x.n === n + 1);
+  const test = T.find(t => t.after === n);
+  let h = `<div class="lh"><span class="crumb">${b.icon} Урок ${l.n} з ${L.length} · ${b.name}</span><h1>${l.title}</h1><p class="sub">${l.sub}</p>
+    <div class="meta"><span>⏱ ${l.mins} хв</span><span>🧩 ${l.sections.filter(s=>s.t==='code'||s.t==='try').length} прикладів коду</span><span>🏠 ${l.hw.length} рівні ДЗ</span></div></div>
+    <div class="goals"><h4>Після уроку ти вмієш</h4><ul>${l.goals.map(g=>`<li>${g}</li>`).join('')}</ul></div>
+    ${l.terms.length?`<div class="terms"><h4>📘 Ключові поняття уроку</h4><dl>${l.terms.map(t=>`<div><dt>${t.t}</dt><dd>${t.d}</dd></div>`).join('')}</dl><a href="#glossary" class="tl">Весь словник →</a></div>`:''}
+    <div class="content">${l.sections.map(secHTML).join('')}</div>
+    <div class="box proj"><h3>🏗️ Крок проєкту «Полиця»</h3><p>${l.project}</p></div>
+    <div class="box check"><h3>🔍 Перевір у браузері</h3><ul>${l.check.map(c=>`<li>${c}</li>`).join('')}</ul></div>
+    <div class="box hwb"><h3>🏠 Домашнє завдання</h3><div class="hw">${l.hw.map(x=>`<div class="hwi"><b>${x.lvl}</b><div>${x.v}</div></div>`).join('')}</div></div>
+    <div class="content"><h2>Самоперевірка</h2></div>${quizHTML(l.quiz, 'l'+n)}
+    ${test?`<a class="testban" href="#test-${test.n}"><span class="e">📝</span><div><b>${test.title}</b><span>${test.sub}</span></div></a>`:''}
+    <div class="donebar"><span>${done[n]?'Урок пройдено 🎉':'Пройшов урок і зробив крок проєкту?'}</span><button class="bigbtn done-btn ${done[n]?'is':''}">${done[n]?'✓ Пройдено':'Позначити як пройдений'}</button></div>
+    <div class="pn">${prev?`<a href="#lesson-${prev.n}"><small>← Урок ${prev.n}</small><b>${prev.title}</b></a>`:'<span></span>'}${next?`<a class="nx" href="#lesson-${next.n}"><small>Урок ${next.n} →</small><b>${next.title}</b></a>`:''}</div>`;
+  $('#view').innerHTML = h;
+  mountSections($('#view'), l.sections);
+  mountQuiz($('#view'), l.quiz);
+  $('.done-btn').onclick = () => { done[n] = !done[n]; if (!done[n]) delete done[n]; saveDone(); route(true); };
+}
+
+function testView(n){
+  const t = T.find(x => x.n === n); if (!t) return home();
+  const b = B[t.block];
+  document.documentElement.style.setProperty('--c', b.color); document.documentElement.style.setProperty('--cs', b.soft);
+  const nxt = L.find(l => l.n === t.after + 1);
+  $('#view').innerHTML = `<div class="lh"><span class="crumb">📝 Контроль знань · ${b.name}</span><h1>${t.title}</h1><p class="sub">${t.sub}</p></div>
+    <div class="call tip" style="margin-top:24px"><div class="ci">📋</div><p>Відповідай самостійно, без підглядання в уроки й AI. Після перевірки побачиш правильні відповіді, пояснення та бал за 12-бальною шкалою. Зроби скріншот результату для вчителя.</p></div>
+    ${quizHTML(t.q, 't'+n)}
+    <div class="pn">${`<a href="#lesson-${t.after}"><small>← Повернутися</small><b>Урок ${t.after}</b></a>`}${nxt?`<a class="nx" href="#lesson-${nxt.n}"><small>Далі →</small><b>Урок ${nxt.n}: ${nxt.title}</b></a>`:`<a class="nx" href="#home"><small>Курс завершено 🎓</small><b>На головну</b></a>`}</div>`;
+  mountQuiz($('#view'), t.q);
+}
+
+function pageView(id){
+  const p = P[id]; if (!p) return home();
+  document.documentElement.style.setProperty('--c', '#F0622E'); document.documentElement.style.setProperty('--cs', '#FFE3D6');
+  $('#view').innerHTML = `<div class="lh"><h1 style="margin-top:0">${p.title}</h1><p class="sub">${p.sub}</p></div><div class="content">${p.sections.map(secHTML).join('')}</div>${p.catalog?'<div id="tcat"></div>':''}`;
+  mountSections($('#view'), p.sections);
+  if (p.catalog) tagCatalog($('#tcat'));
+}
+
+const KIND = { block: ['Блочний', '#2F6FEB'], inline: ['Рядковий', '#F0622E'], hidden: ['Невидимий', '#6B6878'], 'void-block': ['Одиночний · блочний', '#2F6FEB'], 'void-inline': ['Одиночний · рядковий', '#F0622E'] };
+function tagCatalog(root){
+  const G = DATA.tags;
+  root.innerHTML = `<input class="gsearch" id="ts" placeholder="🔍 Пошук тегу… (наприклад: img, посилання, таблиця)">
+    <div class="gfilt">${G.map(g=>`<button data-g="${g.id}" style="--bc:#1D1B26;--bcs:#E7E1D6">${g.name}</button>`).join('')}</div><div id="tl"></div>`;
+  let fg = null;
+  const draw = () => {
+    const q = $('#ts').value.trim().toLowerCase();
+    let h = '';
+    G.forEach(g => {
+      if (fg && fg !== g.id) return;
+      const items = g.items.filter(t => !q || (t.tag + ' ' + t.name + ' ' + t.why).toLowerCase().includes(q));
+      if (!items.length) return;
+      h += `<h2 class="gh">${g.name}</h2><p class="tdesc">${g.desc}</p><div class="tcards">${items.map((t,i)=>{
+        const k = KIND[t.kind]; const runnable = t.kind !== 'hidden';
+        return `<div class="tc" data-g="${g.id}" data-i="${g.items.indexOf(t)}"><div class="tch"><code class="tn">${esc(t.tag)}</code><span class="tk" style="color:${k[1]};border-color:${k[1]}">${k[0]}</span><a class="tl2" href="#lesson-${t.n}">урок ${t.n}</a></div>
+          <b class="tnm">${t.name}</b><p>${t.why}</p>
+          <div class="code"><div class="ch"><span class="ttl"></span><button class="btn cp">Копіювати</button>${runnable?'<button class="btn run">▶ Показати</button>':''}</div><pre><code class="language-markup">${esc(t.ex)}</code></pre></div></div>`;
+      }).join('')}</div>`;
+    });
+    $('#tl').innerHTML = h || '<p>Нічого не знайдено 🤷</p>';
+    $('#tl').querySelectorAll('.tc').forEach(el => {
+      const t = G.find(g => g.id === el.dataset.g).items[+el.dataset.i];
+      const c = el.querySelector('.code');
+      c.querySelector('.cp').onclick = e => copy(t.ex, e.target);
+      const rb = c.querySelector('.run');
+      if (rb) rb.onclick = () => {
+        let out = c.querySelector('.out');
+        if (!out) { out = document.createElement('div'); out.className = 'out'; out.innerHTML = '<iframe sandbox="allow-scripts allow-forms allow-modals" title="Результат"></iframe><div class="cons"></div>'; c.appendChild(out); }
+        runInto(out.querySelector('iframe'), out.querySelector('.cons'), t.ex, 'html', 150);
+      };
+    });
+    if (window.Prism && Prism.highlightAllUnder) { try { Prism.highlightAllUnder($('#tl')); } catch(e) {} }
+  };
+  $('#ts').addEventListener('input', draw);
+  root.querySelectorAll('.gfilt button').forEach(btn => btn.onclick = () => {
+    fg = fg === btn.dataset.g ? null : btn.dataset.g;
+    root.querySelectorAll('.gfilt button').forEach(x => x.classList.toggle('on', x.dataset.g === fg)); draw();
+  });
+  draw();
+}
+function setC(c, cs){ document.documentElement.style.setProperty('--c', c); document.documentElement.style.setProperty('--cs', cs); }
+function glossaryView(){
+  setC('#F0622E', '#FFE3D6');
+  const bl = n => B[L.find(l => l.n === n).block];
+  $('#view').innerHTML = `<div class="lh"><h1 style="margin-top:0">📘 Словник термінів</h1><p class="sub">${DATA.gloss.length} понять курсу простими словами. Біля кожного — урок, де воно з'являється вперше.</p></div>
+    <input class="gsearch" id="gs" placeholder="🔍 Пошук терміна… (наприклад: масив, API, padding)">
+    <div class="gfilt">${DATA.blocks.map(b=>`<button data-b="${b.id}" style="--bc:${b.color};--bcs:${b.soft}">${b.icon} ${b.name}</button>`).join('')}</div>
+    <div id="gl"></div>`;
+  let fb = null;
+  const draw = () => {
+    const q = $('#gs').value.trim().toLowerCase();
+    const list = DATA.gloss.filter(g => (!q || (g.t + ' ' + g.d).toLowerCase().includes(q)) && (!fb || bl(g.n).id === fb));
+    $('#gl').innerHTML = DATA.blocks.map(b => {
+      const items = list.filter(g => bl(g.n).id === b.id); if (!items.length) return '';
+      return `<h2 class="gh" style="color:${b.color}">${b.icon} ${b.name}</h2><div class="gterms">${items.map(g=>`<div class="gt" style="--bc:${b.color};--bcs:${b.soft}"><div class="gtop"><b>${g.t}</b><a href="#lesson-${g.n}">урок ${g.n}</a></div><p>${g.d}</p></div>`).join('')}</div>`;
+    }).join('') || '<p>Нічого не знайдено 🤷</p>';
+  };
+  $('#gs').addEventListener('input', draw);
+  document.querySelectorAll('.gfilt button').forEach(btn => btn.onclick = () => {
+    fb = fb === btn.dataset.b ? null : btn.dataset.b;
+    document.querySelectorAll('.gfilt button').forEach(x => x.classList.toggle('on', x.dataset.b === fb)); draw();
+  });
+  draw();
+}
+function homeworkView(){
+  setC('#F0622E', '#FFE3D6');
+  let h = `<div class="lh"><h1 style="margin-top:0">🏠 Домашні завдання</h1><p class="sub">Усі домашні завдання курсу в одному місці. «Базовий» рівень — обов'язковий для всіх, «Середній» і «Зірочка» — для вищої оцінки.</p></div>
+  <div class="call tip" style="margin-top:22px"><div class="ci">💡</div><p>Відкрий урок, щоб повторити теорію: приклади коду там можна запускати, а в блоках «Спробуй сам» — експериментувати. Відмічай зроблені завдання галочкою — вони збережуться в цьому браузері.</p></div>`;
+  DATA.blocks.forEach(b => {
+    h += `<h2 class="gh" style="color:${b.color}">${b.icon} ${b.name}</h2>`;
+    L.filter(l => l.block === b.id).forEach(l => {
+      h += `<div class="hwl" style="--bc:${b.color};--bcs:${b.soft}"><div class="hwh"><a href="#lesson-${l.n}"><i>${l.n}</i>${l.title}</a></div>
+        <div class="hwp"><b>🏗️ Проєкт:</b> ${l.project}</div>
+        ${l.hw.map((x,k)=>{ const key = 'hw-'+l.n+'-'+k; return `<label class="hwc"><input type="checkbox" data-k="${key}" ${done[key]?'checked':''}><b>${x.lvl}</b><span>${x.v}</span></label>`; }).join('')}</div>`;
+      const t = T.find(x => x.after === l.n);
+      if (t) h += `<a class="testban" href="#test-${t.n}" style="margin:0 0 14px"><span class="e">📝</span><div><b>${t.title}</b><span>${t.sub}</span></div></a>`;
+    });
+  });
+  $('#view').innerHTML = h;
+  $('#view').querySelectorAll('.hwc input').forEach(cb => cb.onchange = () => { if (cb.checked) done[cb.dataset.k] = 1; else delete done[cb.dataset.k]; saveDone(); });
+}
+function planTable(){
+  return `<div class="tbl"><table><thead><tr><th>#</th><th>Тема</th><th>Крок проєкту</th></tr></thead><tbody>${L.map(l=>{
+    const t = T.find(x => x.after === l.n);
+    const proj = l.project.replace(/<[^>]+>/g,'').split('. ')[0].slice(0,110);
+    return `<tr><td><a href="#lesson-${l.n}" style="font-weight:800;color:${B[l.block].color};text-decoration:none">${l.n}</a></td><td><b>${l.title}</b>${l.mins>45?' <small>(90 хв)</small>':''}</td><td style="color:var(--muted);font-size:14px">${proj}${proj.length>=110?'…':''}</td></tr>${t?`<tr><td>📝</td><td colspan="2"><b>${t.title}</b> — ${t.sub}</td></tr>`:''}`;
+  }).join('')}</tbody></table></div>`;
+}
+
+/* ---------- router ---------- */
+function route(keepScroll){
+  const r = (location.hash || '#home').slice(1);
+  side(r);
+  if (r.startsWith('lesson-')) lessonView(+r.split('-')[1]);
+  else if (r.startsWith('test-')) testView(+r.split('-')[1]);
+  else if (r === 'glossary') glossaryView();
+  else if (r === 'homework') homeworkView();
+  else if (P[r]) pageView(r);
+  else { document.documentElement.style.setProperty('--c', '#F0622E'); home(); }
+  document.body.classList.remove('open');
+  if (!keepScroll) window.scrollTo(0, 0);
+  const t = r.startsWith('lesson-') ? L.find(l => 'lesson-'+l.n === r) : null;
+  document.title = t ? `Урок ${t.n}. ${t.title} — Веб-майстерня` : `Веб-майстерня · ${L.length} уроків`;
+}
+window.addEventListener('hashchange', () => route(false));
+$('#menu').onclick = () => document.body.classList.toggle('open');
+document.addEventListener('click', e => { if (document.body.classList.contains('open') && !e.target.closest('.side') && !e.target.closest('#menu')) document.body.classList.remove('open'); });
+route(false);
+if (window.Prism && Prism.highlightAllUnder) {} else { window.addEventListener('load', () => { try { Prism.highlightAllUnder($('#view')); } catch(e) {} }); }
+})();
+</script>
+</body>
+</html>
