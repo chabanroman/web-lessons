@@ -7,6 +7,7 @@ import s14, p1, p2, p3
 from dpages import S_TESTS, P_TESTS, S_GLOSS, P_GLOSS, S_REF, P_REF
 from dpages2 import SHEETS_PAGES, PY_PAGES, KLAS_CSV
 from helpers import H, P, IDEA
+from testcrypt import secure
 
 def build_course(key, lessons, blocks, tests_def, gloss, pages, ref, ref_kind, meta, files=None):
     lessons = copy.deepcopy(lessons)
@@ -37,7 +38,8 @@ def build_course(key, lessons, blocks, tests_def, gloss, pages, ref, ref_kind, m
     for edition in ("teacher", "student"):
         pg = copy.deepcopy(pages)
         if edition == "student": pg.pop("teacher", None)
-        data = {"meta": meta, "files": files or {}, "tags": tg, "blocks": blocks, "lessons": lessons, "tests": tests, "pages": pg, "gloss": gl, "edition": edition}
+        data = {"meta": meta, "files": files or {}, "tags": tg, "blocks": blocks, "lessons": lessons, "tests": copy.deepcopy(tests), "pages": pg, "gloss": gl, "edition": edition}
+        data = secure(data, edition, key)
         js = json.dumps(data, ensure_ascii=False).replace("⟦FMT⟧", fmt)
         assert "⟦" not in js
         js = js.replace("</", "<\\/")

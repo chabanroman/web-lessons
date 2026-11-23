@@ -9,6 +9,7 @@ from c6 import PAGES
 from gloss import G
 from tags import GROUPS
 import c38
+from testcrypt import secure
 
 ID25 = c38.ID25
 PARENT = {"links": "text", "tables": "semantic", "colors": "css-intro", "responsive": "grid", "anim": "grid", "landing": "grid",
@@ -76,6 +77,7 @@ def build(version, edition):
 
     tg = [{"id": gid, "name": gname, "desc": gdesc, "items": [{"tag": t, "name": nm, "why": why, "ex": ex, "n": num.get(lid) or num[gmap(lid)], "kind": kind} for t, nm, why, ex, lid, kind in items]} for gid, gname, gdesc, items in GROUPS]
     data = {"tags": tg, "blocks": blocks, "lessons": lessons, "tests": tests, "pages": pages, "gloss": gl, "edition": edition, "version": version}
+    data = secure(data, edition, f"course{version}")
     js = json.dumps(data, ensure_ascii=False)
 
     def tok(m):

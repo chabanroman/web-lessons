@@ -19,7 +19,7 @@ html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.65 'Golos Text',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 h1,h2,h3,.brand{font-family:'Unbounded','Golos Text',sans-serif;letter-spacing:-.01em;line-height:1.2}
-code,kbd,pre,textarea.ed{font-family:'JetBrains Mono',ui-monospace,monospace}
+code,kbd,pre,textarea.ed{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-ligatures:none;font-feature-settings:'liga' 0,'calt' 0}
 :not(pre)>code{background:var(--soft);border:1px solid var(--line);padding:1px 6px;border-radius:6px;font-size:.86em;white-space:nowrap}
 kbd{background:#fff;border:1px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:0 6px;font-size:.82em}
 
@@ -242,6 +242,37 @@ textarea.ed{white-space:pre;overflow:auto;border:0;resize:vertical;min-height:28
 .sheet figcaption{font-size:14px;color:var(--muted);padding:10px 14px;border-top:1px solid #EEE;font-family:'Golos Text',sans-serif}
 .allc{display:block;margin:10px 8px 0;font-size:13.5px;font-weight:600;color:var(--muted);text-decoration:none}
 .allc:hover{color:var(--ink)}
+.cedit{display:flex;flex-direction:column;background:var(--code-bg);min-width:0}
+.crow{display:flex;height:300px;position:relative}
+.gut{flex:none;width:46px;padding:14px 10px 14px 0;text-align:right;color:#5E5A6E;font:14px/1.6 'JetBrains Mono',monospace;overflow:hidden;user-select:none;background:#191820;border-right:1px solid #2E2B39}
+.gut span{display:block}
+.gut span.on{color:#FFD166;font-weight:700}
+.cwrap{position:relative;flex:1;min-width:0}
+.cwrap pre.chl,.cwrap textarea.ed{position:absolute;inset:0;margin:0;padding:14px 16px;font:14px/1.6 'JetBrains Mono',monospace;white-space:pre;tab-size:4;border:0;letter-spacing:0;word-spacing:0;min-height:0;height:100%;width:100%;box-sizing:border-box}
+.cwrap pre.chl{overflow:hidden;pointer-events:none;color:#EDEAF5;background:transparent}
+.cwrap textarea.ed{overflow:auto;color:transparent;background:transparent;caret-color:#fff;resize:none;outline:none;z-index:1;-webkit-text-fill-color:transparent}
+.cwrap textarea.ed::selection{background:rgba(127,176,255,.35)}
+.cstat{display:flex;justify-content:space-between;gap:10px;font:12px 'JetBrains Mono',monospace;color:#8F8AA0;padding:5px 12px;background:#191820;border-top:1px solid #2E2B39}
+.play .pg{min-height:0}
+.play.py .pl .cedit{flex:1}
+.tadmin{background:var(--paper);border:2px solid var(--ink);border-radius:var(--r);padding:18px 22px;margin:22px 0}
+.tadmin h4{margin:0 0 10px;font-size:15px}
+.tsw{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px dashed var(--line);cursor:pointer}
+.tsw input{position:absolute;opacity:0;pointer-events:none}
+.tsw .sl{flex:none;width:44px;height:24px;border-radius:99px;background:#D9D4CA;position:relative;transition:.2s}
+.tsw .sl:after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:99px;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.tsw input:checked+.sl{background:#18A058}
+.tsw input:checked+.sl:after{left:23px}
+.tsw input:disabled+.sl{opacity:.5}
+.tsw small{display:block;color:var(--muted);font-size:13px}
+.tmsg{min-height:22px;font-size:14.5px;font-weight:600;margin-top:6px}
+.tmsg.ok{color:#18A058}.tmsg.bad{color:#E5484D}
+.ttok{margin-top:10px;font-size:14.5px}
+.ttok summary{cursor:pointer;font-weight:600;color:var(--muted)}
+.ttok ol{padding-left:20px}
+.trow{display:flex;gap:8px;flex-wrap:wrap}
+.trow input{flex:1;min-width:220px;padding:10px 12px;border-radius:10px;border:2px solid var(--line);font:14px 'JetBrains Mono',monospace}
+.trow .bigbtn{padding:10px 18px;font-size:14px}
 .donebar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:40px;padding:18px 20px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);flex-wrap:wrap}
 .done-btn.is{background:#18A058}
 .pn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
@@ -315,6 +346,29 @@ const M = Object.assign({
   nav: [['tools','🛠️ Де працювати'],['browser','🔍 Як перевіряти сторінку'],['project','📚 Проєкт «Полиця»'],['tags','🏷️ Довідник тегів'],['glossary','📘 Словник термінів'],['homework','🏠 Домашні завдання']]
 }, DATA.meta || {});
 const L = DATA.lessons, T = DATA.tests, P = DATA.pages;
+const IS_T = DATA.edition === 'teacher';
+const TT = () => T.filter(t => IS_T || t.q);
+const b64u = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function decTest(t, k){
+  const key = await crypto.subtle.importKey('raw', b64u(k), 'AES-GCM', false, ['decrypt']);
+  const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64u(t.enc.iv) }, key, b64u(t.enc.data));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+let TCFG = {};
+async function loadTestCfg(){
+  try {
+    const r = await fetch('../config/tests.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return;
+    TCFG = await r.json();
+  } catch (e) { return; }
+  if (IS_T) return;
+  const my = (TCFG && TCFG[DATA.courseKey]) || {}; let changed = false;
+  for (const t of T) {
+    const k = my[t.n];
+    if (k && t.enc && !t.q) { try { t.q = await decTest(t, k); changed = true; } catch (e) {} }
+  }
+  if (changed) route(true);
+}
 const $ = s => document.querySelector(s);
 const ukn = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return n + ' ' + (m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c); };
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -487,6 +541,47 @@ function sheetHTML(s){
   h += `</tbody></table></div><div class="stab"><span>${esc(s.name||'Аркуш1')}</span></div>${s.cap?`<figcaption>${s.cap}</figcaption>`:''}</figure>`;
   return h;
 }
+function makeEditor(ta, lang, ind){
+  const box = document.createElement('div'); box.className = 'cedit';
+  box.innerHTML = '<div class="crow"><div class="gut"></div><div class="cwrap"><pre class="chl" aria-hidden="true"><code class="language-' + lang + '"></code></pre></div></div><div class="cstat"><span class="cpos">Рядок 1, символ 1</span><span>' + (lang === 'python' ? 'Python · Tab — відступ 4 пробіли · Ctrl+Enter — запуск' : 'HTML · результат оновлюється сам') + '</span></div>';
+  ta.parentNode.insertBefore(box, ta); box.querySelector('.cwrap').appendChild(ta);
+  ta.setAttribute('wrap', 'off'); ta.setAttribute('autocapitalize', 'off'); ta.setAttribute('autocomplete', 'off');
+  const gut = box.querySelector('.gut'), pre = box.querySelector('.chl'), code = pre.firstChild, pos = box.querySelector('.cpos');
+  let lines = 0;
+  const caret = () => {
+    const before = ta.value.slice(0, ta.selectionStart), ln = before.split('\n').length, col = ta.selectionStart - before.lastIndexOf('\n');
+    pos.textContent = `Рядок ${ln}, символ ${col}`;
+    gut.querySelectorAll('.on').forEach(x => x.classList.remove('on'));
+    const sp = gut.children[ln - 1]; if (sp) sp.classList.add('on');
+  };
+  const paint = () => {
+    code.textContent = ta.value + '\n';
+    if (window.Prism && Prism.languages[lang]) { try { Prism.highlightElement(code); } catch (e) {} }
+    const n = ta.value.split('\n').length;
+    if (n !== lines) { lines = n; gut.innerHTML = Array.from({ length: n }, (_, i) => `<span>${i + 1}</span>`).join(''); }
+    sync(); caret();
+  };
+  const sync = () => { pre.scrollTop = ta.scrollTop; pre.scrollLeft = ta.scrollLeft; gut.scrollTop = ta.scrollTop; };
+  const ins = (txt) => { if (!document.execCommand('insertText', false, txt)) { const p = ta.selectionStart; ta.setRangeText(txt, p, ta.selectionEnd, 'end'); ta.dispatchEvent(new Event('input')); } };
+  ta.addEventListener('input', paint);
+  ta.addEventListener('scroll', sync);
+  ['keyup', 'click', 'select', 'focus'].forEach(ev => ta.addEventListener(ev, caret));
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); ins(' '.repeat(ind)); }
+    else if (e.key === 'Tab' && e.shiftKey) {
+      e.preventDefault(); const st = ta.value.lastIndexOf('\n', ta.selectionStart - 1) + 1; const m = ta.value.slice(st).match(/^ {1,4}/);
+      if (m) { const p = ta.selectionStart; ta.setRangeText('', st, st + Math.min(m[0].length, ind), 'preserve'); ta.selectionStart = ta.selectionEnd = Math.max(st, p - m[0].length); paint(); }
+    }
+    else if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+      const st = ta.value.lastIndexOf('\n', ta.selectionStart - 1) + 1, line = ta.value.slice(st, ta.selectionStart);
+      let ws = line.match(/^\s*/)[0];
+      if (lang === 'python' && /:\s*(#.*)?$/.test(line)) ws += ' '.repeat(ind);
+      e.preventDefault(); ins('\n' + ws);
+    }
+  });
+  paint();
+  return { set(v){ ta.value = v; paint(); }, paint };
+}
 function mountSections(root, secs){
   root.querySelectorAll('.code').forEach(el => {
     const s = secs[+el.dataset.i];
@@ -503,22 +598,20 @@ function mountSections(root, secs){
   root.querySelectorAll('.play.py').forEach(el => {
     const s = secs[+el.dataset.i]; const ta = el.querySelector('.ed'), ip = el.querySelector('.pinp'), out = el.querySelector('.pyout');
     ta.value = s.v; ip.value = s.inp || '';
+    const ed = makeEditor(ta, 'python', 4);
     const go = () => pyRun(ta.value, ip.value, out);
     el.querySelector('.prun').onclick = go;
-    ta.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); go(); }
-      if (e.key === 'Tab') { e.preventDefault(); const p = ta.selectionStart; ta.value = ta.value.slice(0,p) + '    ' + ta.value.slice(ta.selectionEnd); ta.selectionStart = ta.selectionEnd = p + 4; }
-    });
-    el.querySelector('.rs').onclick = () => { ta.value = s.v; ip.value = s.inp || ''; out.innerHTML = ''; };
+    ta.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); go(); } });
+    el.querySelector('.rs').onclick = () => { ed.set(s.v); ip.value = s.inp || ''; out.innerHTML = ''; };
     el.querySelector('.cp').onclick = e => copy(ta.value, e.target);
   });
   root.querySelectorAll('.play:not(.py)').forEach(el => {
     const s = secs[+el.dataset.i]; const ta = el.querySelector('textarea'), fr = el.querySelector('iframe'), cons = el.querySelector('.cons');
     ta.value = s.v; let t;
+    const ed = makeEditor(ta, 'markup', 2);
     const go = () => runInto(fr, cons, ta.value, 'html');
     ta.addEventListener('input', () => { clearTimeout(t); t = setTimeout(go, 350); });
-    ta.addEventListener('keydown', e => { if (e.key === 'Tab') { e.preventDefault(); const p = ta.selectionStart; ta.value = ta.value.slice(0,p) + '  ' + ta.value.slice(ta.selectionEnd); ta.selectionStart = ta.selectionEnd = p + 2; } });
-    el.querySelector('.rs').onclick = () => { ta.value = s.v; go(); };
+    el.querySelector('.rs').onclick = () => { ed.set(s.v); go(); };
     el.querySelector('.cp').onclick = e => copy(ta.value, e.target);
     go();
   });
@@ -580,7 +673,7 @@ function side(route){
     h += `<div class="nb" style="--bc:${b.color};--bcs:${b.soft}"><div class="nb-h" style="color:${b.color}"><span style="background:${b.color}"></span>${b.name}</div>`;
     L.filter(l => l.block === b.id).forEach(l => {
       h += `<a class="nl ${done[l.n]?'done':''} ${route==='lesson-'+l.n?'on':''}" href="#lesson-${l.n}"><span class="num">${done[l.n]?'✓':l.n}</span>${l.title}</a>`;
-      T.filter(t => t.after === l.n).forEach(t => {
+      TT().filter(t => t.after === l.n).forEach(t => {
         h += `<a class="nl test ${route==='test-'+t.n?'on':''}" href="#test-${t.n}"><span class="num">📝</span><b>${t.title}</b></a>`;
       });
     });
@@ -608,7 +701,7 @@ function home(){
   <h2 style="font-size:26px;margin:34px 0 14px">Маршрут курсу</h2><div class="road">`;
   DATA.blocks.forEach(b => {
     const ls = L.filter(l => l.block === b.id), ts = T.filter(t => t.block === b.id);
-    h += `<div class="rb" style="--bc:${b.color};--bcs:${b.soft}"><h3>${b.icon} ${b.name} <small>· уроки ${ls[0].n}–${ls[ls.length-1].n} · ${b.sub}</small></h3><div class="chips">${ls.map(l=>`<a class="chip" href="#lesson-${l.n}"><i>${done[l.n]?'✓':l.n}</i>${l.title}</a>`+T.filter(t=>t.after===l.n).map(t=>`<a class="chip t" href="#test-${t.n}"><i>📝</i>${t.title}</a>`).join('')).join('')}</div></div>`;
+    h += `<div class="rb" style="--bc:${b.color};--bcs:${b.soft}"><h3>${b.icon} ${b.name} <small>· уроки ${ls[0].n}–${ls[ls.length-1].n} · ${b.sub}</small></h3><div class="chips">${ls.map(l=>`<a class="chip" href="#lesson-${l.n}"><i>${done[l.n]?'✓':l.n}</i>${l.title}</a>`+TT().filter(t=>t.after===l.n).map(t=>`<a class="chip t" href="#test-${t.n}"><i>📝</i>${t.title}</a>`).join('')).join('')}</div></div>`;
   });
   h += `</div>
   <h2 style="font-size:26px;margin:40px 0 14px">Як працювати з курсом</h2>
@@ -630,7 +723,7 @@ function lessonView(n){
   const b = B[l.block];
   document.documentElement.style.setProperty('--c', b.color); document.documentElement.style.setProperty('--cs', b.soft);
   const prev = L.find(x => x.n === n - 1), next = L.find(x => x.n === n + 1);
-  const test = T.find(t => t.after === n);
+  const test = TT().find(t => t.after === n);
   let h = `<div class="lh"><span class="crumb">${b.icon} Урок ${l.n} з ${L.length} · ${b.name}</span><h1>${l.title}</h1><p class="sub">${l.sub}</p>
     <div class="meta"><span>⏱ ${l.mins} хв</span><span>🧩 ${l.sections.filter(s=>['code','try','sheet'].includes(s.t)).length} прикладів</span><span>🏠 ${l.hw.length} рівні ДЗ</span></div></div>
     <div class="goals"><h4>Після уроку ти вмієш</h4><ul>${l.goals.map(g=>`<li>${g}</li>`).join('')}</ul></div>
@@ -652,13 +745,67 @@ function lessonView(n){
 function testView(n){
   const t = T.find(x => x.n === n); if (!t) return home();
   const b = B[t.block];
+  if (!IS_T && !t.q) {
+    setC(b.color, b.soft);
+    $('#view').innerHTML = `<div class="lh"><span class="crumb">📝 Контроль знань</span><h1>${t.title}</h1><p class="sub">${t.sub}</p></div><div class="call warn" style="margin-top:24px"><div class="ci">🔒</div><p>Контрольну ще не відкрито. Вчитель відкриє її на уроці — тоді вона з'явиться тут і в меню.</p></div><div class="pn"><a href="#lesson-${t.after}"><small>← Повернутися</small><b>Урок ${t.after}</b></a></div>`;
+    return;
+  }
   document.documentElement.style.setProperty('--c', b.color); document.documentElement.style.setProperty('--cs', b.soft);
   const nxt = L.find(l => l.n === t.after + 1);
   $('#view').innerHTML = `<div class="lh"><span class="crumb">📝 Контроль знань · ${b.name}</span><h1>${t.title}</h1><p class="sub">${t.sub}</p></div>
     <div class="call tip" style="margin-top:24px"><div class="ci">📋</div><p>Відповідай самостійно, без підглядання в уроки й AI. Після перевірки побачиш правильні відповіді, пояснення та бал за 12-бальною шкалою. Зроби скріншот результату для вчителя.</p></div>
+    ${IS_T ? testAdminHTML([t]) : ''}
     ${quizHTML(t.q, 't'+n)}
     <div class="pn">${`<a href="#lesson-${t.after}"><small>← Повернутися</small><b>Урок ${t.after}</b></a>`}${nxt?`<a class="nx" href="#lesson-${nxt.n}"><small>Далі →</small><b>Урок ${nxt.n}: ${nxt.title}</b></a>`:`<a class="nx" href="#home"><small>Курс завершено 🎓</small><b>На головну</b></a>`}</div>`;
   mountQuiz($('#view'), t.q);
+  if (IS_T) mountTestAdmin($('#view'));
+}
+
+/* ---------- керування видимістю контрольних (лише видання для вчителя) ---------- */
+const GH = { owner: 'chabanroman', repo: 'web-lessons', path: 'config/tests.json' };
+const ghToken = { get(){ try { return localStorage.getItem('gh-token') || ''; } catch(e) { return ''; } }, set(v){ try { v ? localStorage.setItem('gh-token', v) : localStorage.removeItem('gh-token'); } catch(e) {} } };
+function testAdminHTML(list){
+  const my = (TCFG && TCFG[DATA.courseKey]) || {};
+  return `<div class="tadmin"><h4>👁 Видимість контрольних для учнів</h4>
+    ${list.map(t=>`<label class="tsw"><input type="checkbox" data-n="${t.n}" ${my[t.n]?'checked':''}><span class="sl"></span><span><b>${t.title}</b><small>${t.sub}</small></span></label>`).join('')}
+    <div class="tmsg"></div>
+    <details class="ttok"><summary>⚙️ Ключ доступу GitHub ${ghToken.get()?'(збережено ✓)':'(потрібен один раз)'}</summary>
+      <p>Перемикач зберігає налаштування в репозиторії курсу на GitHub. Для цього потрібен особистий ключ доступу (лише ваш, зберігається тільки в цьому браузері):</p>
+      <ol><li>GitHub → <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">Settings → Developer settings → Fine-grained tokens → Generate new token</a>.</li>
+      <li>Repository access: <b>Only select repositories</b> → <code>${GH.repo}</code>.</li>
+      <li>Permissions → Repository → <b>Contents: Read and write</b>. Термін дії — до кінця навчального року.</li>
+      <li>Скопіюйте ключ (починається з <code>github_pat_</code>) і вставте нижче.</li></ol>
+      <div class="trow"><input type="password" class="tkn" placeholder="github_pat_…" value="${esc(ghToken.get())}"><button class="bigbtn tsave">Зберегти</button></div>
+    </details></div>`;
+}
+async function ghWriteVisibility(n, on){
+  const tok = ghToken.get(); if (!tok) throw new Error('Спершу збережіть ключ доступу GitHub (нижче).');
+  const url = `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH.path}`;
+  const hdr = { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json' };
+  let sha, cfg = {};
+  const g = await fetch(url + '?ref=main&t=' + Date.now(), { headers: hdr, cache: 'no-store' });
+  if (g.ok) { const j = await g.json(); sha = j.sha; cfg = JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g, ''))))); }
+  else if (g.status !== 404) throw new Error(g.status === 401 ? 'Ключ GitHub недійсний або прострочений.' : 'GitHub відповів ' + g.status);
+  cfg[DATA.courseKey] = cfg[DATA.courseKey] || {};
+  const t = T.find(x => x.n === n);
+  if (on) cfg[DATA.courseKey][n] = DATA.testKeys[n]; else delete cfg[DATA.courseKey][n];
+  const body = { message: `${on ? 'Відкрито' : 'Приховано'}: ${t.title} (${M.brand})`, content: btoa(unescape(encodeURIComponent(JSON.stringify(cfg, null, 2) + '\n'))), branch: 'main' };
+  if (sha) body.sha = sha;
+  const p = await fetch(url, { method: 'PUT', headers: hdr, body: JSON.stringify(body) });
+  if (!p.ok) throw new Error(p.status === 403 || p.status === 404 ? 'Ключ не має права запису в репозиторій (Contents: Read and write).' : 'GitHub відповів ' + p.status);
+  TCFG = cfg;
+}
+function mountTestAdmin(root){
+  root.querySelectorAll('.tadmin').forEach(box => {
+    const msg = box.querySelector('.tmsg');
+    box.querySelector('.tsave').onclick = () => { ghToken.set(box.querySelector('.tkn').value.trim()); msg.className = 'tmsg ok'; msg.textContent = 'Ключ збережено в цьому браузері ✓'; };
+    box.querySelectorAll('.tsw input').forEach(cb => cb.onchange = async () => {
+      const n = +cb.dataset.n; cb.disabled = true; msg.className = 'tmsg'; msg.textContent = '⏳ Зберігаю…';
+      try { await ghWriteVisibility(n, cb.checked); msg.className = 'tmsg ok'; msg.textContent = cb.checked ? '✅ Відкрито. Учні побачать контрольну приблизно за 1–2 хвилини (після оновлення сторінки).' : '🙈 Приховано. Зникне в учнів приблизно за 1–2 хвилини.'; }
+      catch (e) { cb.checked = !cb.checked; msg.className = 'tmsg bad'; msg.textContent = '❌ ' + e.message; }
+      cb.disabled = false;
+    });
+  });
 }
 
 function pageView(id){
@@ -667,6 +814,7 @@ function pageView(id){
   $('#view').innerHTML = `<div class="lh"><h1 style="margin-top:0">${p.title}</h1><p class="sub">${p.sub}</p></div><div class="content">${p.sections.map(secHTML).join('')}</div>${p.catalog?'<div id="tcat"></div>':''}`;
   mountSections($('#view'), p.sections);
   if (p.catalog) tagCatalog($('#tcat'));
+  if (id === 'teacher' && IS_T) { const d = document.createElement('div'); d.innerHTML = testAdminHTML(T); $('#view .lh').after(d); mountTestAdmin($('#view')); }
 }
 
 const KIND = { fx: ['Google Sheets', '#0F9D58'], py: ['Python', '#3776AB'], block: ['Блочний', '#2F6FEB'], inline: ['Рядковий', '#F0622E'], hidden: ['Невидимий', '#6B6878'], 'void-block': ['Одиночний · блочний', '#2F6FEB'], 'void-inline': ['Одиночний · рядковий', '#F0622E'] };
@@ -745,7 +893,7 @@ function homeworkView(){
       h += `<div class="hwl" style="--bc:${b.color};--bcs:${b.soft}"><div class="hwh"><a href="#lesson-${l.n}"><i>${l.n}</i>${l.title}</a></div>
         <div class="hwp"><b>🏗️ Проєкт:</b> ${l.project}</div>
         ${l.hw.map((x,k)=>{ const key = 'hw-'+l.n+'-'+k; return `<label class="hwc"><input type="checkbox" data-k="${key}" ${done[key]?'checked':''}><b>${x.lvl}</b><span>${x.v}</span></label>`; }).join('')}</div>`;
-      const t = T.find(x => x.after === l.n);
+      const t = TT().find(x => x.after === l.n);
       if (t) h += `<a class="testban" href="#test-${t.n}" style="margin:0 0 14px"><span class="e">📝</span><div><b>${t.title}</b><span>${t.sub}</span></div></a>`;
     });
   });
@@ -779,6 +927,7 @@ window.addEventListener('hashchange', () => route(false));
 $('#menu').onclick = () => document.body.classList.toggle('open');
 document.addEventListener('click', e => { if (document.body.classList.contains('open') && !e.target.closest('.side') && !e.target.closest('#menu')) document.body.classList.remove('open'); });
 route(false);
+loadTestCfg().then(() => { if (IS_T && (location.hash === '#teacher' || location.hash.startsWith('#test-'))) route(true); });
 if (window.Prism && Prism.highlightAllUnder) {} else { window.addEventListener('load', () => { try { Prism.highlightAllUnder($('#view')); } catch(e) {} }); }
 })();
 </script>
