@@ -9,6 +9,7 @@
 | 🌐 **Веб-майстерня** — інтенсив | 25 | HTML, CSS, JavaScript, SQL, бекенд, AI у швидкому темпі | [`/25/`](https://chabanroman.github.io/web-lessons/25/) |
 | 🌐 **Веб-майстерня** — повний курс | 38 | те саме спокійніше, з Git, налагодженням і практикумами | [`/38/`](https://chabanroman.github.io/web-lessons/38/) |
 | 📗 **Таблиці-майстерня** | 14 | Google Sheets: формули, логіка, пошук, діаграми, зведені таблиці, Forms, дашборд | [`/sheets/`](https://chabanroman.github.io/web-lessons/sheets/) |
+| 📷 **Фотокурс Sony A7 IV + Tamron 28–75 G2** | 15 модулів + 2 додатки | фотографія з нуля: кнопки, меню, режими, AF, 27 сценаріїв, 14 днів практики, шпаргалки, PDF | [`/photo/`](https://chabanroman.github.io/web-lessons/photo/) |
 | 🐍 **Python-майстерня** | 24 | Python з нуля: від print() до pandas і графіків; код запускається прямо в браузері | [`/python/`](https://chabanroman.github.io/web-lessons/python/) |
 
 ---
@@ -110,5 +111,9 @@ git add -A && git commit -m "Опис змін" && git push
 | `teacher/index.html` | Сторінка входу для вчителя |
 
 Номери уроків у тексті не пишуться вручну: замість них використовуються мітки на кшталт `⟦supa⟧` чи `⟦r:js⟧`, які скрипт сам замінює на правильні номери для кожної версії.
+
+### Фотокурс
+
+Джерело — `src/photo/` (c1–c7: модулі, `svg.py`: схеми й демо-сцени, `build.py`: збирання). Зібрати: `python3 src/photo/build.py --pdf` → `photo/index.html`, `photo/cheatsheets.html`, `photo/sony-a7iv-course.pdf`, `photo/cheatsheets.pdf` (PDF потребує playwright + Chrome).
 
 Ідеї розвитку — у папці [`docs/`](docs/): загальний план [IDEAS.md](docs/IDEAS.md) і окремі ідеї.
